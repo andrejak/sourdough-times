@@ -5,12 +5,23 @@
   "author": "Andreja Kogovsek <andreja.kogovsek1@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "parcel index.html --open",
-    "build": "parcel build index.html",
+    "dev": "run-p dev:**",
+    "dev:app": "node scripts/runDevServer.js",
+    "dev:lambda": "netlify-lambda serve src/lambda",
+    "serve:app": "parcel src/index.html --open",
+    "serve:lambda": "netlify-lambda serve src/lambda",
+    "build": "run-p build:**",
+    "build:app": "parcel build src/index.html",
+    "build:lambda": "netlify-lambda build src/lambda",
     "clean": "rm -rf dist",
     "lint": "eslint --ext ts,tsx src"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-typescript": "^7.10.1",
+    "@types/aws-lambda": "^8.10.53",
+    "@types/node": "^14.0.11",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
@@ -18,11 +29,21 @@
     "eslint": "^7.1.0",
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "^4.0.4",
+    "http-proxy-middleware": "^1.0.4",
+    "netlify-lambda": "^1.6.3",
+    "npm-run-all": "^4.1.5",
     "parcel-bundler": "^1.12.4",
     "typescript": "^3.9.5"
   },
   "dependencies": {
+    "aws-lambda": "^1.0.6",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-typescript"
+    ]
   }
 }
