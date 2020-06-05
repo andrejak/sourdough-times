@@ -1,12 +1,12 @@
-const { createProxyMiddleware } = require("http-proxy-middleware");
-const Bundler = require("parcel-bundler");
-const express = require("express");
+import { createProxyMiddleware } from "http-proxy-middleware";
+import Bundler from "parcel-bundler";
+import Express from "express";
 
 const bundler = new Bundler("src/index.html", {
   cache: false,
 });
 
-const app = express();
+const app = Express();
 const PORT = process.env.PORT || 1234;
 
 app.use(

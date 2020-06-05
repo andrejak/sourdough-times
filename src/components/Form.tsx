@@ -11,18 +11,14 @@ const Form: React.FC = () => {
         style={{ display: "flex", flexDirection: "column" }}
         onSubmit={async (e) => {
           e.preventDefault();
-          //e.stopPropagation();
           const response = await fetch("/.netlify/functions/calculate", {
             body: JSON.stringify(input),
             method: "POST",
           });
-          console.log("cx", response);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const data = await response?.json();
-          console.log("got", data);
-          setResult(JSON.stringify(data));
+          const data = await response.json();
+          const newResult: string = data.result;
+          setResult(newResult);
         }}
-        // action="/.netlify/functions/hello_name"
       >
         <label>Number of folds:</label>
         <input
@@ -31,7 +27,7 @@ const Form: React.FC = () => {
           onChange={(e) => {
             const parsed = parseInt(e.target.value);
             if (parsed) {
-              setInput({ numFolds: parsed, ...input });
+              setInput({ ...input, numFolds: parsed });
             }
           }}
         ></input>
