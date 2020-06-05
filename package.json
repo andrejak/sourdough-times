@@ -1,0 +1,13 @@
+{
+  "name": "sourdough-times",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Andreja Kogovsek <andreja.kogovsek1@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel index.html"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  }
+}
