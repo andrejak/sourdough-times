@@ -54,23 +54,23 @@ type BaseConfig = {
   method: FieldType;
 };
 
-interface FoldConfig extends BaseConfig {
+export interface FoldConfig extends BaseConfig {
   numFolds: FieldType;
   timeBetweenFolds: FieldType;
   bulkFermentation: FieldType;
   coldFermentation: FieldType;
 }
 
-interface KneadConfig extends BaseConfig {
-  firstProof: FieldType;
-  secondProof: FieldType;
+export interface KneadConfig extends BaseConfig {
+  firstProof: ProofFieldType;
+  secondProof: ProofFieldType;
 }
 
-interface NoKneadConfig extends BaseConfig {
+export interface NoKneadConfig extends BaseConfig {
   numFolds: FieldType;
   timeBetweenFolds: FieldType;
-  firstProof: FieldType;
-  secondProof: FieldType;
+  firstProof: ProofFieldType;
+  secondProof: ProofFieldType;
 }
 
 const initMethod: FieldType = {
@@ -125,7 +125,7 @@ export const initBaseConfig: BaseConfig = {
     help: "If you're not going straight from the fridge to the oven.",
     type: "duration",
     optional: true,
-    value: moment.duration(20, "minute"),
+    value: 20,
     min: 10,
     max: 180,
     step: 10,
@@ -133,7 +133,7 @@ export const initBaseConfig: BaseConfig = {
   preheat: {
     label: "minutes to preheat the oven",
     type: "duration",
-    value: moment.duration(20, "minute"),
+    value: 20,
     min: 5,
     max: 60,
     step: 5,
@@ -141,14 +141,14 @@ export const initBaseConfig: BaseConfig = {
   baking: {
     label: "minutes to bake",
     type: "duration",
-    value: moment.duration(35, "minute"),
+    value: 35,
     min: 20,
     max: 60,
   },
   cooling: {
     label: "hours to cool",
     type: "duration",
-    value: moment.duration(2, "hour"),
+    value: 120,
     optional: true,
   },
 };
@@ -159,7 +159,7 @@ export const initNoKneadConfig: NoKneadConfig = {
   timeBetweenFolds: {
     label: "minutes between folds",
     type: "duration",
-    value: moment.duration(30, "minute"),
+    value: 30,
     min: 15,
     max: 60,
     step: 15,
@@ -205,7 +205,7 @@ export const initFoldConfig: FoldConfig = {
   timeBetweenFolds: {
     label: "minutes between folds",
     type: "duration",
-    value: moment.duration(30, "minute"),
+    value: 30,
     min: 15,
     max: 60,
     step: 15,

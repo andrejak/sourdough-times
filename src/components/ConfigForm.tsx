@@ -2,7 +2,6 @@ import React from "react";
 import {
   Step,
   initBaseConfig,
-  OtherFieldType,
   BakeConfig,
   initKneadConfig,
   initNoKneadConfig,

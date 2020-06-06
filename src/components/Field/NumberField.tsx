@@ -55,7 +55,7 @@ const NumberField = ({
         value = field.value as number;
         break;
       case "duration":
-        value = (field.value as moment.Duration).minutes(); // hours?
+        value = field.value as number;
         break;
       case "range":
         value = (field.value as Range<number>).from;
@@ -86,7 +86,7 @@ const NumberField = ({
                   to: parseInt(e.target.value),
                 });
               } else if (field.type === "duration") {
-                setValue(moment.duration(e.target.value, "minute"));
+                setValue(parseInt(e.target.value));
               } else {
                 setValue(parseInt(e.target.value));
               }
