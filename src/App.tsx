@@ -3,6 +3,7 @@ import { Step } from "./types";
 import styled from "styled-components";
 import Steps from "./components/Steps";
 import ConfigForm from "./components/ConfigForm";
+import "./styles/global.css";
 
 const Container = styled.div`
   display: flex;

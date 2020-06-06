@@ -1,6 +1,6 @@
 import moment from "moment";
 
-type Range<T> = {
+export type Range<T> = {
   from: T;
   to: T;
 };
@@ -80,7 +80,7 @@ const initMethod: FieldType = {
 };
 
 const fridgeField = (value: boolean): OtherFieldType => ({
-  label: "Proof in fridge?",
+  label: "Prove in fridge",
   type: "boolean",
   value,
 });
@@ -102,10 +102,12 @@ const initBaseConfig: BaseConfig = {
   },
   inFridge: fridgeField(true),
   numFeedsPerDay: {
-    label: "How many feeds per day?",
+    label: "Feeds per day",
     help: "",
     type: "number",
     value: 1,
+    min: 1,
+    max: 4,
   },
   method: initMethod,
   autolyse: {
@@ -123,13 +125,13 @@ const initBaseConfig: BaseConfig = {
     help: "If you're not going straight from the fridge to the oven.",
     type: "duration",
     optional: true,
-    value: moment.duration(15, "minute"),
+    value: moment.duration(20, "minute"),
     min: 10,
     max: 180,
     step: 10,
   },
   preheat: {
-    label: "Time to preheat the oven",
+    label: "minutes to preheat the oven",
     type: "duration",
     value: moment.duration(20, "minute"),
     min: 5,
@@ -137,14 +139,14 @@ const initBaseConfig: BaseConfig = {
     step: 5,
   },
   baking: {
-    label: "Baking time",
+    label: "minutes to bake",
     type: "duration",
     value: moment.duration(35, "minute"),
     min: 20,
     max: 60,
   },
   cooling: {
-    label: "Cooling time",
+    label: "hours to cool",
     type: "duration",
     value: moment.duration(2, "hour"),
     optional: true,

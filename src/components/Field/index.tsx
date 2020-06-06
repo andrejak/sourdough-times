@@ -1,55 +1,15 @@
 import React from "react";
-import { FieldType, ProofFieldType, OtherFieldType, Method } from "../../types";
+import { FieldType, ProofFieldType } from "../../types";
 import NumberField, { DatetimeField } from "./NumberField";
 import styled from "styled-components";
+import CheckboxField from "./CheckboxField";
+import MethodField from "./MethodField";
 
-const Container = styled.div`
+const HorizontalContainer = styled.div`
   display: flex;
   align-items: center;
   padding: 0.5rem;
 `;
-
-const Input = styled.input`
-  width: 40px;
-`;
-
-const CheckboxField = ({
-  field,
-  setValue,
-}: {
-  field: OtherFieldType;
-  setValue: (newValue: boolean) => void;
-}): JSX.Element => (
-  <Container>
-    <label>{field.label}</label>
-    <Input
-      type="checkbox"
-      checked={field.value === true}
-      onChange={(e) => setValue(!e.target.checked)}
-    ></Input>
-  </Container>
-);
-
-const MethodField = ({
-  field,
-  setValue,
-}: {
-  field: OtherFieldType;
-  setValue: (newValue: Method) => void;
-}): JSX.Element => (
-  <Container>
-    <label>{field.label}</label>
-    <select
-      id="method"
-      value={field.value as Method}
-      onChange={(e) => setValue(e.target.value as Method)}
-    >
-      <option value="noKnead">No knead</option>
-      <option value="fold">Fold</option>
-      <option value="knead">Knead</option>
-    </select>
-  </Container>
-);
 
 const ProofField = ({
   field,
@@ -59,10 +19,28 @@ const ProofField = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (newValue: any) => void;
 }): JSX.Element => (
-  <Container>
-    <CheckboxField field={field.value.inFridge} setValue={setValue} />
-    <NumberField field={field.value.duration} setValue={setValue} />
-  </Container>
+  <HorizontalContainer>
+    <CheckboxField
+      field={field.value.inFridge}
+      setValue={(newValue) =>
+        setValue({
+          ...field.value,
+          inFridge: { ...field.value.inFridge, value: newValue },
+        })
+      }
+    />
+    {field.value.inFridge.value && (
+      <NumberField
+        field={field.value.duration}
+        setValue={(newValue) =>
+          setValue({
+            ...field.value,
+            duration: { ...field.value.duration, value: newValue },
+          })
+        }
+      />
+    )}
+  </HorizontalContainer>
 );
 
 const mapTypeToComponent = {
