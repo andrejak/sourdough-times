@@ -1,8 +1,6 @@
 import React from "react";
 import { Step, initState } from "../types";
-import NumberField from "./Field/NumberField";
 import styled from "styled-components";
-import moment from "moment";
 import Field from "./Field";
 
 const Form = styled.form`
@@ -21,7 +19,7 @@ const ConfigForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     const response = await fetch("/.netlify/functions/calculate", {
-      body: JSON.stringify(input),
+      body: JSON.stringify(config),
       method: "POST",
     });
     const data: Step[] = await response.json();
@@ -50,26 +48,6 @@ const ConfigForm = ({
           />
         );
       })}
-      <label>{config.target.label}</label>
-      <input
-        type="datetime-local"
-        value={config.target.value.toString()}
-        onChange={(e) =>
-          setConfig({
-            ...config,
-            target: { ...config.target, value: moment(e.target.value) },
-          })
-        }
-      ></input>
-      <NumberField
-        field={config.numFeedsPerDay}
-        setValue={(newValue: number) => {
-          setConfig({
-            ...config,
-            numFeedsPerDay: { ...config.numFeedsPerDay, value: newValue },
-          });
-        }}
-      />
       <input type="submit" value="Submit" />
     </Form>
   );

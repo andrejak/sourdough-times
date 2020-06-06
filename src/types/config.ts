@@ -5,36 +5,42 @@ type Range<T> = {
   to: T;
 };
 
-type Method = "fold" | "knead" | "noKnead";
+export type Method = "fold" | "knead" | "noKnead";
 export type BakeConfig = NoKneadConfig | KneadConfig | FoldConfig;
 
-type Proof = {
-  inFridge: boolean;
-  length: moment.Duration | Range<number> | Range<moment.Duration>;
-};
+export type FieldType = NumericalFieldType | OtherFieldType | ProofFieldType;
 
-export type FieldType = {
+type BaseFieldType = {
   label: string;
   help?: string;
   optional?: boolean;
-  type:
-    | "boolean"
-    | "number"
-    | "datetime"
-    | "duration"
-    | "range"
-    | "method"
-    | "proof";
-  value:
-    | boolean
-    | number
-    | moment.Moment
-    | moment.Duration
-    | Range<number>
-    | Method
-    | Proof
-    | null;
 };
+
+export interface NumericalFieldType extends BaseFieldType {
+  type: "number" | "duration" | "range" | "datetime";
+  value:
+    | number
+    | moment.Duration
+    | moment.Moment
+    | Range<number | moment.Duration>
+    | null;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
+export interface ProofFieldType extends BaseFieldType {
+  type: "proof";
+  value: {
+    inFridge: OtherFieldType;
+    duration: NumericalFieldType;
+  };
+}
+
+export interface OtherFieldType extends BaseFieldType {
+  type: "boolean" | "method";
+  value: boolean | Method;
+}
 
 type BaseConfig = {
   inFridge: FieldType;
@@ -73,9 +79,21 @@ const initMethod: FieldType = {
   value: "noKnead",
 };
 
+const fridgeField = (value: boolean): OtherFieldType => ({
+  label: "Proof in fridge?",
+  type: "boolean",
+  value,
+});
+
+const hourRangeField = (from: number, to: number): NumericalFieldType => ({
+  label: "How many hours?",
+  type: "range",
+  value: { from, to },
+});
+
 const initBaseConfig: BaseConfig = {
   method: initMethod,
-  inFridge: { label: "", help: "", type: "boolean", value: true },
+  inFridge: fridgeField(true),
   numFeedsPerDay: { label: "", help: "", type: "number", value: 1 },
   target: {
     label: "When do you want to eat the bread?",
@@ -126,13 +144,16 @@ export const initNoKneadConfig: NoKneadConfig = {
     label: "First proof",
     help: "",
     type: "proof",
-    value: { inFridge: true, length: { from: 12, to: 24 } },
+    value: { inFridge: fridgeField(true), duration: hourRangeField(12, 24) },
   },
   secondProof: {
     label: "Second proof",
     help: "",
     type: "proof",
-    value: { inFridge: false, length: moment.duration(2, "hour") },
+    value: {
+      inFridge: fridgeField(false),
+      duration: hourRangeField(1, 3),
+    },
   },
   ...initBaseConfig,
 };
@@ -167,13 +188,13 @@ export const initFoldConfig: FoldConfig = {
     help: "Range in hours",
     type: "proof",
     optional: true,
-    value: { inFridge: false, length: { from: 1, to: 8 } },
+    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 8) },
   },
   coldFermentation: {
     label: "Cold fermentation",
     help: "Range in hours",
     type: "proof",
-    value: { inFridge: true, length: { from: 8, to: 24 } },
+    value: { inFridge: fridgeField(true), duration: hourRangeField(8, 24) },
   },
   ...initBaseConfig,
 };

@@ -1,36 +1,81 @@
 import React from "react";
-import styled from "styled-components";
-import { FieldType } from "../../types";
+import { FieldType, ProofFieldType, OtherFieldType, Method } from "../../types";
+import NumberField from "./NumberField";
+import DatetimeField from "./DatetimeField";
 
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-`;
+const CheckboxField = ({
+  field,
+  setValue,
+}: {
+  field: OtherFieldType;
+  setValue: (newValue: boolean) => void;
+}): JSX.Element => (
+  <>
+    <label>{field.label}</label>
+    <input
+      type="checkbox"
+      checked={field.value === true}
+      onChange={(e) => setValue(!e.target.checked)}
+    ></input>
+  </>
+);
 
-const Input = styled.input`
-  width: 30px;
-`;
+const MethodField = ({
+  field,
+  setValue,
+}: {
+  field: OtherFieldType;
+  setValue: (newValue: Method) => void;
+}): JSX.Element => (
+  <>
+    <label>{field.label}</label>
+    <input
+      type="checkbox"
+      checked={field.value === true}
+      onChange={() => setValue("knead")}
+    ></input>
+  </>
+);
+
+const ProofField = ({
+  field,
+  setValue,
+}: {
+  field: ProofFieldType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setValue: (newValue: any) => void;
+}): JSX.Element => (
+  <>
+    <label>{field.label}</label>
+    <input
+      type="checkbox"
+      checked={field.value.inFridge.value === true}
+      onChange={(e) => setValue(!e.target.value)}
+    ></input>
+  </>
+);
+
+const mapTypeToComponent = {
+  datetime: DatetimeField,
+  number: NumberField,
+  range: NumberField,
+  duration: NumberField,
+  boolean: CheckboxField,
+  method: MethodField,
+  proof: ProofField,
+};
 
 const Field = ({
   field,
   setValue,
 }: {
   field: FieldType;
-  setValue: (newValue: number) => void;
-}): JSX.Element => (
-  <Container>
-    <label>{field.label}</label>
-    <Input
-      type="text"
-      value={field.value ? field.value.toString() : "Missing"}
-      onChange={(e) => {
-        const parsed = parseInt(e.target.value);
-        if (parsed) {
-          setValue(parsed);
-        }
-      }}
-    ></Input>
-  </Container>
-);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setValue: (newValue: any) => void;
+}): JSX.Element => {
+  const Component = mapTypeToComponent[field.type];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <Component field={field as any} setValue={setValue} />;
+};
 
 export default Field;

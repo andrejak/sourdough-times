@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { FieldType } from "../../types";
+import { NumericalFieldType } from "../../types";
 
 const Container = styled.div`
   display: flex;
@@ -15,20 +15,18 @@ const NumberField = ({
   field,
   setValue,
 }: {
-  field: FieldType;
+  field: NumericalFieldType;
   setValue: (newValue: number) => void;
 }): JSX.Element => (
   <Container>
     <label>{field.label}</label>
     <Input
-      type="text"
-      value={field.value.toString()}
-      onChange={(e) => {
-        const parsed = parseInt(e.target.value);
-        if (parsed) {
-          setValue(parsed);
-        }
-      }}
+      type="number"
+      min={field.min}
+      max={field.max}
+      step={field.step}
+      value={field.value?.toString()} // TODO
+      onChange={(e) => setValue(parseInt(e.target.value))}
     ></Input>
   </Container>
 );
