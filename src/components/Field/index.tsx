@@ -1,7 +1,17 @@
 import React from "react";
 import { FieldType, ProofFieldType, OtherFieldType, Method } from "../../types";
-import NumberField from "./NumberField";
-import DatetimeField from "./DatetimeField";
+import NumberField, { DatetimeField } from "./NumberField";
+import styled from "styled-components";
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+`;
+
+const Input = styled.input`
+  width: 40px;
+`;
 
 const CheckboxField = ({
   field,
@@ -10,14 +20,14 @@ const CheckboxField = ({
   field: OtherFieldType;
   setValue: (newValue: boolean) => void;
 }): JSX.Element => (
-  <>
+  <Container>
     <label>{field.label}</label>
-    <input
+    <Input
       type="checkbox"
       checked={field.value === true}
       onChange={(e) => setValue(!e.target.checked)}
-    ></input>
-  </>
+    ></Input>
+  </Container>
 );
 
 const MethodField = ({
@@ -27,14 +37,18 @@ const MethodField = ({
   field: OtherFieldType;
   setValue: (newValue: Method) => void;
 }): JSX.Element => (
-  <>
+  <Container>
     <label>{field.label}</label>
-    <input
-      type="checkbox"
-      checked={field.value === true}
-      onChange={() => setValue("knead")}
-    ></input>
-  </>
+    <select
+      id="method"
+      value={field.value as Method}
+      onChange={(e) => setValue(e.target.value as Method)}
+    >
+      <option value="noKnead">No knead</option>
+      <option value="fold">Fold</option>
+      <option value="knead">Knead</option>
+    </select>
+  </Container>
 );
 
 const ProofField = ({
@@ -45,14 +59,10 @@ const ProofField = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (newValue: any) => void;
 }): JSX.Element => (
-  <>
-    <label>{field.label}</label>
-    <input
-      type="checkbox"
-      checked={field.value.inFridge.value === true}
-      onChange={(e) => setValue(!e.target.value)}
-    ></input>
-  </>
+  <Container>
+    <CheckboxField field={field.value.inFridge} setValue={setValue} />
+    <NumberField field={field.value.duration} setValue={setValue} />
+  </Container>
 );
 
 const mapTypeToComponent = {

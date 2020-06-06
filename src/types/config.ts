@@ -89,24 +89,34 @@ const hourRangeField = (from: number, to: number): NumericalFieldType => ({
   label: "How many hours?",
   type: "range",
   value: { from, to },
+  min: 1,
+  max: 48,
 });
 
 const initBaseConfig: BaseConfig = {
-  method: initMethod,
-  inFridge: fridgeField(true),
-  numFeedsPerDay: { label: "", help: "", type: "number", value: 1 },
   target: {
     label: "When do you want to eat the bread?",
     help: "",
     type: "datetime",
     value: moment().add(3, "d").set({ hour: 12, minute: 0 }),
   },
+  inFridge: fridgeField(true),
+  numFeedsPerDay: {
+    label: "How many feeds per day?",
+    help: "",
+    type: "number",
+    value: 1,
+  },
+  method: initMethod,
   autolyse: {
     label: "Autolyse",
     help: "Mixing flour and water before adding salt",
     type: "duration",
     value: null,
     optional: true,
+    min: 15,
+    max: 60,
+    step: 5,
   },
   shaping: {
     label: "Rest time after shaping",
@@ -114,21 +124,30 @@ const initBaseConfig: BaseConfig = {
     type: "duration",
     optional: true,
     value: moment.duration(15, "minute"),
+    min: 10,
+    max: 180,
+    step: 10,
   },
   preheat: {
     label: "Time to preheat the oven",
     type: "duration",
     value: moment.duration(20, "minute"),
+    min: 5,
+    max: 60,
+    step: 5,
   },
   baking: {
     label: "Baking time",
     type: "duration",
     value: moment.duration(35, "minute"),
+    min: 20,
+    max: 60,
   },
   cooling: {
     label: "Cooling time",
     type: "duration",
     value: moment.duration(2, "hour"),
+    optional: true,
   },
 };
 
@@ -139,6 +158,9 @@ export const initNoKneadConfig: NoKneadConfig = {
     label: "Time between folds",
     type: "duration",
     value: moment.duration(30, "minute"),
+    min: 15,
+    max: 60,
+    step: 15,
   },
   firstProof: {
     label: "First proof",
@@ -163,14 +185,14 @@ export const initKneadConfig: KneadConfig = {
   firstProof: {
     label: "First proof",
     help: "",
-    type: "duration",
-    value: moment.duration(3, "hour"),
+    type: "proof",
+    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
   },
   secondProof: {
     label: "Second proof",
     help: "",
-    type: "duration",
-    value: moment.duration(3, "hour"),
+    type: "proof",
+    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
   },
   ...initBaseConfig,
 };
@@ -182,6 +204,9 @@ export const initFoldConfig: FoldConfig = {
     label: "Time between folds",
     type: "duration",
     value: moment.duration(1, "hour"),
+    min: 15,
+    max: 60,
+    step: 15,
   },
   bulkFermentation: {
     label: "Bulk fermentation",

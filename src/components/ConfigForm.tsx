@@ -6,7 +6,6 @@ import Field from "./Field";
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 1rem;
 `;
 
@@ -34,7 +33,6 @@ const ConfigForm = ({
     <Form onSubmit={handleSubmit}>
       {Object.keys(config).map((fieldId) => {
         const field = config[fieldId];
-        console.log("f", fieldId, field);
         return (
           <Field
             key={fieldId}
