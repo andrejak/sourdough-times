@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Field } from "../types";
+import { FieldType } from "../../types";
 
 const Container = styled.div`
   display: flex;
@@ -11,18 +11,18 @@ const Input = styled.input`
   width: 30px;
 `;
 
-const NumberField = ({
+const Field = ({
   field,
   setValue,
 }: {
-  field: Field;
+  field: FieldType;
   setValue: (newValue: number) => void;
 }): JSX.Element => (
   <Container>
     <label>{field.label}</label>
     <Input
       type="text"
-      value={field.value.toString()}
+      value={field.value ? field.value.toString() : "Missing"}
       onChange={(e) => {
         const parsed = parseInt(e.target.value);
         if (parsed) {
@@ -33,4 +33,4 @@ const NumberField = ({
   </Container>
 );
 
-export default NumberField;
+export default Field;

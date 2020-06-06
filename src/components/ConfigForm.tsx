@@ -1,8 +1,9 @@
 import React from "react";
 import { Step, initState } from "../types";
-import NumberField from "./NumberField";
+import NumberField from "./Field/NumberField";
 import styled from "styled-components";
 import moment from "moment";
+import Field from "./Field";
 
 const Form = styled.form`
   display: flex;
@@ -16,7 +17,7 @@ const ConfigForm = ({
 }: {
   setResult: (steps: Step[]) => void;
 }): JSX.Element => {
-  const [input, setInput] = React.useState(initState);
+  const [config, setConfig] = React.useState(initState);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const response = await fetch("/.netlify/functions/calculate", {
@@ -33,23 +34,39 @@ const ConfigForm = ({
 
   return (
     <Form onSubmit={handleSubmit}>
-      <label>{input.target.label}</label>
+      {Object.keys(config).map((fieldId) => {
+        const field = config[fieldId];
+        console.log("f", fieldId, field);
+        return (
+          <Field
+            key={fieldId}
+            field={field}
+            setValue={(newValue: number) => {
+              setConfig({
+                ...config,
+                [fieldId]: { ...config[fieldId], value: newValue },
+              });
+            }}
+          />
+        );
+      })}
+      <label>{config.target.label}</label>
       <input
         type="datetime-local"
-        value={input.target.value.toString()}
+        value={config.target.value.toString()}
         onChange={(e) =>
-          setInput({
-            ...input,
-            target: { ...input.target, value: moment(e.target.value) },
+          setConfig({
+            ...config,
+            target: { ...config.target, value: moment(e.target.value) },
           })
         }
       ></input>
       <NumberField
-        field={input.numFeedsPerDay}
+        field={config.numFeedsPerDay}
         setValue={(newValue: number) => {
-          setInput({
-            ...input,
-            numFeedsPerDay: { ...input.numFeedsPerDay, value: newValue },
+          setConfig({
+            ...config,
+            numFeedsPerDay: { ...config.numFeedsPerDay, value: newValue },
           });
         }}
       />

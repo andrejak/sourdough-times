@@ -13,7 +13,7 @@ type Proof = {
   length: moment.Duration | Range<number> | Range<moment.Duration>;
 };
 
-export type Field = {
+export type FieldType = {
   label: string;
   help?: string;
   optional?: boolean;
@@ -37,37 +37,37 @@ export type Field = {
 };
 
 type BaseConfig = {
-  inFridge: Field;
-  numFeedsPerDay: Field;
-  target: Field;
-  autolyse: Field;
-  shaping: Field;
-  preheat: Field;
-  baking: Field;
-  cooling: Field;
-  method: Field;
+  inFridge: FieldType;
+  numFeedsPerDay: FieldType;
+  target: FieldType;
+  autolyse: FieldType;
+  shaping: FieldType;
+  preheat: FieldType;
+  baking: FieldType;
+  cooling: FieldType;
+  method: FieldType;
 };
 
 interface FoldConfig extends BaseConfig {
-  numFolds: Field;
-  timeBetweenFolds: Field;
-  bulkFermentation: Field;
-  coldFermentation: Field;
+  numFolds: FieldType;
+  timeBetweenFolds: FieldType;
+  bulkFermentation: FieldType;
+  coldFermentation: FieldType;
 }
 
 interface KneadConfig extends BaseConfig {
-  firstProof: Field;
-  secondProof: Field;
+  firstProof: FieldType;
+  secondProof: FieldType;
 }
 
 interface NoKneadConfig extends BaseConfig {
-  numFolds: Field;
-  timeBetweenFolds: Field;
-  firstProof: Field;
-  secondProof: Field;
+  numFolds: FieldType;
+  timeBetweenFolds: FieldType;
+  firstProof: FieldType;
+  secondProof: FieldType;
 }
 
-const initMethod: Field = {
+const initMethod: FieldType = {
   label: "Method",
   type: "method",
   value: "noKnead",
