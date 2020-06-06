@@ -80,20 +80,20 @@ const initMethod: FieldType = {
 };
 
 const fridgeField = (value: boolean): OtherFieldType => ({
-  label: "Prove in fridge",
+  label: "prove in fridge",
   type: "boolean",
   value,
 });
 
 const hourRangeField = (from: number, to: number): NumericalFieldType => ({
-  label: "How many hours?",
+  label: "hours",
   type: "range",
   value: { from, to },
   min: 1,
   max: 48,
 });
 
-const initBaseConfig: BaseConfig = {
+export const initBaseConfig: BaseConfig = {
   target: {
     label: "When do you want to eat the bread?",
     help: "",
@@ -102,7 +102,7 @@ const initBaseConfig: BaseConfig = {
   },
   inFridge: fridgeField(true),
   numFeedsPerDay: {
-    label: "Feeds per day",
+    label: "feeds per day",
     help: "",
     type: "number",
     value: 1,
@@ -111,7 +111,7 @@ const initBaseConfig: BaseConfig = {
   },
   method: initMethod,
   autolyse: {
-    label: "Autolyse",
+    label: "autolyse",
     help: "Mixing flour and water before adding salt",
     type: "duration",
     value: null,
@@ -121,7 +121,7 @@ const initBaseConfig: BaseConfig = {
     step: 5,
   },
   shaping: {
-    label: "Rest time after shaping",
+    label: "minutes rest after shaping",
     help: "If you're not going straight from the fridge to the oven.",
     type: "duration",
     optional: true,
@@ -155,9 +155,9 @@ const initBaseConfig: BaseConfig = {
 
 export const initNoKneadConfig: NoKneadConfig = {
   method: { ...initMethod, value: "noKnead" },
-  numFolds: { label: "Number of folds", type: "number", value: 2 },
+  numFolds: { label: "folds", type: "number", value: 2 },
   timeBetweenFolds: {
-    label: "Time between folds",
+    label: "minutes between folds",
     type: "duration",
     value: moment.duration(30, "minute"),
     min: 15,
@@ -201,11 +201,11 @@ export const initKneadConfig: KneadConfig = {
 
 export const initFoldConfig: FoldConfig = {
   method: { ...initMethod, value: "fold" },
-  numFolds: { label: "Number of folds", type: "number", value: 4 },
+  numFolds: { label: "folds", type: "number", value: 4 },
   timeBetweenFolds: {
-    label: "Time between folds",
+    label: "minutes between folds",
     type: "duration",
-    value: moment.duration(1, "hour"),
+    value: moment.duration(30, "minute"),
     min: 15,
     max: 60,
     step: 15,

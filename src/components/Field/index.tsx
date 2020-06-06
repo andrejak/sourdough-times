@@ -3,7 +3,6 @@ import { FieldType, ProofFieldType } from "../../types";
 import NumberField, { DatetimeField } from "./NumberField";
 import styled from "styled-components";
 import CheckboxField from "./CheckboxField";
-import MethodField from "./MethodField";
 
 const HorizontalContainer = styled.div`
   display: flex;
@@ -49,7 +48,6 @@ const mapTypeToComponent = {
   range: NumberField,
   duration: NumberField,
   boolean: CheckboxField,
-  method: MethodField,
   proof: ProofField,
 };
 
