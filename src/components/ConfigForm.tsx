@@ -2,6 +2,7 @@ import React from "react";
 import { Step, initState } from "../types";
 import NumberField from "./NumberField";
 import styled from "styled-components";
+import moment from "moment";
 
 const Form = styled.form`
   display: flex;
@@ -16,28 +17,40 @@ const ConfigForm = ({
   setResult: (steps: Step[]) => void;
 }): JSX.Element => {
   const [input, setInput] = React.useState(initState);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch("/.netlify/functions/calculate", {
+      body: JSON.stringify(input),
+      method: "POST",
+    });
+    const data: Step[] = await response.json();
+    if (response.ok) {
+      setResult(data);
+    } else {
+      console.log("Error", data);
+    }
+  };
 
   return (
-    <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const response = await fetch("/.netlify/functions/calculate", {
-          body: JSON.stringify(input),
-          method: "POST",
-        });
-        if (response.ok) {
-          const data: Step[] = await response.json();
-          setResult(data);
-        } else {
-          console.log("Error", await response.json());
+    <Form onSubmit={handleSubmit}>
+      <label>{input.target.label}</label>
+      <input
+        type="datetime-local"
+        value={input.target.value.toString()}
+        onChange={(e) =>
+          setInput({
+            ...input,
+            target: { ...input.target, value: moment(e.target.value) },
+          })
         }
-      }}
-    >
+      ></input>
       <NumberField
-        label={"Number of feeds per day usually:"}
-        value={input.numFeedsPerDay}
+        field={input.numFeedsPerDay}
         setValue={(newValue: number) => {
-          setInput({ ...input, numFeedsPerDay: newValue });
+          setInput({
+            ...input,
+            numFeedsPerDay: { ...input.numFeedsPerDay, value: newValue },
+          });
         }}
       />
       <input type="submit" value="Submit" />

@@ -5,7 +5,7 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
   try {
     const body: BakeConfig = JSON.parse(event.body);
     const steps: Step[] = [
-      { when: body.target.toString(), instruction: "Eat the bread!" },
+      { when: body.target.value.toString(), instruction: "Eat the bread!" },
     ];
     return {
       statusCode: 200,

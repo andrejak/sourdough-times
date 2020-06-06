@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { Field } from "../types";
 
 const Container = styled.div`
   display: flex;
@@ -11,19 +12,17 @@ const Input = styled.input`
 `;
 
 const NumberField = ({
-  label,
-  value,
+  field,
   setValue,
 }: {
-  label: string;
-  value: number;
+  field: Field;
   setValue: (newValue: number) => void;
 }): JSX.Element => (
   <Container>
-    <label>{label}</label>
+    <label>{field.label}</label>
     <Input
       type="text"
-      value={value}
+      value={field.value.toString()}
       onChange={(e) => {
         const parsed = parseInt(e.target.value);
         if (parsed) {
