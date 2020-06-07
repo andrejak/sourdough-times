@@ -1,13 +1,11 @@
 import React from "react";
+import { Step, BakeConfig, Method } from "../types";
 import {
-  Step,
   initBaseConfig,
-  BakeConfig,
   initKneadConfig,
   initNoKneadConfig,
   initFoldConfig,
-  Method,
-} from "../types";
+} from "../state";
 import styled from "styled-components";
 import Field from "./Field";
 import MethodField from "./Field/MethodField";
