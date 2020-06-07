@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { NumericalFieldType, Range } from "../../types";
-import moment from "moment";
+import { NumberFieldType } from "../../types";
 import CheckboxField from "./CheckboxField";
 import { minsInH } from "../../state";
 
@@ -9,7 +8,6 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0 0.5rem;
   height: 40px;
 `;
 
@@ -22,58 +20,25 @@ const Input = styled.input`
   margin: 0 0.5rem;
 `;
 
-const DateTimeContainer = styled.div`
-  padding: 0 0.5rem;
-`;
-
-export const DatetimeField = ({
-  field,
-  setValue,
-}: {
-  field: NumericalFieldType;
-  setValue: (newValue: moment.Moment) => void;
-}): JSX.Element => {
-  const date = (field.value as moment.Moment).format("YYYY-MM-DD");
-  const time = (field.value as moment.Moment).format("hh:mm");
-  console.log(date, time);
-  return (
-    <Container>
-      <Label>{field.label}</Label>
-      <DateTimeContainer>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setValue(moment(e.target.value + " " + time))}
-          required
-        ></input>
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setValue(moment(date + " " + e.target.value))}
-          required
-        ></input>
-      </DateTimeContainer>
-    </Container>
-  );
+const convertToUnit = (value: number, unit: "min" | "h" | undefined) => {
+  if (unit === "h") {
+    return value / minsInH;
+  }
+  return value;
 };
 
 const NumberField = ({
   field,
   setValue,
 }: {
-  field: NumericalFieldType;
-  setValue: (newValue: number | Range<number>) => void;
+  field: NumberFieldType;
+  setValue: (newValue: number) => void;
 }): JSX.Element => {
   const [show, setShow] = React.useState(
     !field.optional || field.value !== null
   );
-  let value = field.min || 1;
-  if (field.value) {
-    value = field.value as number;
-    if (field.type === "range") {
-      value = (field.value as Range<number>).from;
-    }
-  }
+  const value = convertToUnit(field.value || field.min || 0, field.displayUnit);
+  const multiplier = field.displayUnit === "h" ? 60 : 1;
 
   return (
     <Container>
@@ -84,7 +49,7 @@ const NumberField = ({
             if (show) {
               setValue(null);
             } else {
-              setValue(value);
+              setValue(value * multiplier);
             }
             setShow(checked);
           }}
@@ -94,28 +59,15 @@ const NumberField = ({
         <Container>
           {field.optional && "for"}
           <Input
-            type={field.type === "range" ? "range" : "number"}
-            min={field.min}
-            max={field.max}
-            step={field.step}
+            type={"number"}
+            min={convertToUnit(field.min, field.displayUnit)}
+            max={convertToUnit(field.max, field.displayUnit)}
+            step={convertToUnit(field.step, field.displayUnit)}
             value={value}
-            onChange={(e) => {
-              if (field.type === "range") {
-                setValue({
-                  from: parseInt(e.target.value),
-                  to: parseInt(e.target.value),
-                });
-              } else {
-                setValue(parseInt(e.target.value));
-              }
-            }}
+            onChange={(e) => setValue(parseInt(e.target.value) * multiplier)}
           ></Input>
-          {!field.optional && (
-            <Label>
-              {field.type === "range" && value / minsInH} {field.label}
-            </Label>
-          )}
-          {field.optional && "minutes"}
+          {!field.optional && <Label>{field.label}</Label>}
+          {field.optional && (field.displayUnit || "minutes")}
         </Container>
       )}
     </Container>

@@ -5,13 +5,12 @@ import {
   Step,
   ProofFieldType,
   Range,
-  FieldType,
+  NumberFieldType,
 } from "../types";
 import moment from "moment";
 import { minsInH } from "../state";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const subtractMinutes = (time: moment.Moment, value: any) =>
+const subtractMinutes = (time: moment.Moment, value: number) =>
   time.clone().subtract(value, "minutes");
 
 type Info = { stepTime: moment.Moment; steps: Step[] };
@@ -62,7 +61,7 @@ const generateProvingInstructions = (
   };
 };
 
-const generateStep = (field: FieldType, stepTime: moment.Moment) => {
+const generateStep = (field: NumberFieldType, stepTime: moment.Moment) => {
   const newTime = subtractMinutes(stepTime, field.value);
   return {
     stepTime: newTime.clone(),

@@ -5,7 +5,7 @@ import styled from "styled-components";
 const Container = styled.div`
   display: flex;
   align-items: baseline;
-  padding: 0.5rem;
+  padding: 0.5rem 0;
 `;
 
 const Label = styled.label`

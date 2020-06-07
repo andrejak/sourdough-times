@@ -7,7 +7,11 @@ export type Range<T> = {
 
 export type Method = "fold" | "knead" | "noKnead";
 
-export type FieldType = NumericalFieldType | BooleanFieldType | ProofFieldType;
+export type FieldType =
+  | DateTimeFieldType
+  | NumberFieldType
+  | BooleanFieldType
+  | ProofFieldType;
 
 type BaseFieldType = {
   label: string;
@@ -16,9 +20,23 @@ type BaseFieldType = {
   instruction?: string;
 };
 
-export interface NumericalFieldType extends BaseFieldType {
-  type: "number" | "duration" | "range" | "datetime";
-  value: number | moment.Moment | Range<number> | null;
+export interface DateTimeFieldType extends BaseFieldType {
+  type: "datetime";
+  value: moment.Moment;
+}
+
+export interface NumberFieldType extends BaseFieldType {
+  type: "number";
+  value: number | null;
+  min?: number;
+  max?: number;
+  step?: number;
+  displayUnit?: "min" | "h";
+}
+
+export interface RangeFieldType extends BaseFieldType {
+  type: "range";
+  value: Range<number>;
   min?: number;
   max?: number;
   step?: number;
@@ -29,7 +47,7 @@ export interface ProofFieldType extends BaseFieldType {
   type: "proof";
   value: {
     inFridge: BooleanFieldType;
-    duration: NumericalFieldType;
+    duration: RangeFieldType;
   };
 }
 
@@ -41,22 +59,22 @@ export interface BooleanFieldType extends BaseFieldType {
 export type BasicSection = {
   method: Method;
   target: FieldType;
-  numFeedsPerDay: NumericalFieldType;
+  numFeedsPerDay: NumberFieldType;
 };
 
 export type PrefermentSection = {
-  autolyse: NumericalFieldType;
-  levain: NumericalFieldType;
+  autolyse: NumberFieldType;
+  levain: NumberFieldType;
 };
 
 export type BakingSection = {
-  preheat: NumericalFieldType;
-  baking: NumericalFieldType;
-  cooling: NumericalFieldType;
+  preheat: NumberFieldType;
+  baking: NumberFieldType;
+  cooling: NumberFieldType;
 };
 
 export type ShapingSection = {
-  shaping: NumericalFieldType;
+  shaping: NumberFieldType;
 };
 
 export type ProvingSection = {
@@ -65,8 +83,8 @@ export type ProvingSection = {
 };
 
 export interface FoldingSection {
-  numFolds: NumericalFieldType;
-  timeBetweenFolds: NumericalFieldType;
+  numFolds: NumberFieldType;
+  timeBetweenFolds: NumberFieldType;
 }
 
 export type FullConfig = {

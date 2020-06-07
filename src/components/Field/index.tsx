@@ -1,52 +1,15 @@
 import React from "react";
-import { FieldType, ProofFieldType } from "../../types";
-import NumberField, { DatetimeField } from "./NumberField";
-import styled from "styled-components";
+import { FieldType } from "../../types";
+import NumberField from "./NumberField";
 import CheckboxField from "./CheckboxField";
-
-const HorizontalContainer = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-`;
-
-const ProofField = ({
-  field,
-  setValue,
-}: {
-  field: ProofFieldType;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: (newValue: any) => void;
-}): JSX.Element => (
-  <HorizontalContainer>
-    <CheckboxField
-      field={field.value.inFridge}
-      setValue={(newValue) =>
-        setValue({
-          ...field.value,
-          inFridge: { ...field.value.inFridge, value: newValue },
-        })
-      }
-    />
-    {field.value.inFridge.value && (
-      <NumberField
-        field={field.value.duration}
-        setValue={(newValue) =>
-          setValue({
-            ...field.value,
-            duration: { ...field.value.duration, value: newValue },
-          })
-        }
-      />
-    )}
-  </HorizontalContainer>
-);
+import RangeField from "./RangeField";
+import DateTimeField from "./DateTimeField";
+import ProofField from "./ProofField";
 
 const mapTypeToComponent = {
-  datetime: DatetimeField,
+  datetime: DateTimeField,
   number: NumberField,
-  range: NumberField,
-  duration: NumberField,
+  range: RangeField,
   boolean: CheckboxField,
   proof: ProofField,
 };

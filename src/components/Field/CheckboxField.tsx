@@ -2,16 +2,17 @@ import React from "react";
 import { BooleanFieldType } from "../../types";
 import styled from "styled-components";
 
-const HorizontalContainer = styled.div`
+const Container = styled.div`
   display: flex;
   align-items: center;
   height: 40px;
+  padding-right: 0.4rem;
 `;
 
 const Label = styled.label``;
 
 const Input = styled.input`
-  width: 40px;
+  width: 20px;
 `;
 
 const CheckboxField = ({
@@ -21,14 +22,14 @@ const CheckboxField = ({
   field: BooleanFieldType;
   setValue: (newValue: boolean) => void;
 }): JSX.Element => (
-  <HorizontalContainer>
+  <Container>
     <Input
       type="checkbox"
       checked={field.value === true}
       onChange={() => setValue(!field.value)}
     ></Input>
     <Label>{field.label}</Label>
-  </HorizontalContainer>
+  </Container>
 );
 
 export default CheckboxField;

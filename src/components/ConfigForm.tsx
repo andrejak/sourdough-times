@@ -65,7 +65,6 @@ const ConfigForm = ({
     newConfig.basicSection.method = method;
 
     setConfig(newConfig as FullConfig);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method]);
 
   const handleSubmit = async (e) => {
@@ -101,6 +100,7 @@ const ConfigForm = ({
                   key={fieldId}
                   field={field}
                   setValue={(newValue: number) => {
+                    // TODO: Improve this...
                     const newConfig = {
                       ...config,
                       [section]: {

@@ -9,7 +9,9 @@ import Footer from "./components/Footer";
 const Page = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   min-width: 100vh;
+  width: 100vw;
 `;
 
 const Container = styled.div`
@@ -17,7 +19,7 @@ const Container = styled.div`
   align-items: flex-start;
   flex-wrap: wrap;
   justify-content: space-between;
-  width: 100vw;
+  max-width: 1000px;
 `;
 
 const App: React.FC = () => {
