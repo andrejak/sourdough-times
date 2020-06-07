@@ -17,12 +17,7 @@ type BaseFieldType = {
 
 export interface NumericalFieldType extends BaseFieldType {
   type: "number" | "duration" | "range" | "datetime";
-  value:
-    | number
-    | moment.Duration
-    | moment.Moment
-    | Range<number | moment.Duration>
-    | null;
+  value: number | moment.Moment | Range<number> | null;
   min?: number;
   max?: number;
   step?: number;
@@ -64,15 +59,10 @@ export type ShapingSection = {
   shaping: NumericalFieldType;
 };
 
-export type ProovingSection =
-  | {
-      firstProof: ProofFieldType;
-      secondProof: ProofFieldType;
-    }
-  | {
-      bulkFermentation: ProofFieldType;
-      coldFermentation: ProofFieldType;
-    };
+export type ProvingSection = {
+  firstProof: ProofFieldType;
+  secondProof: ProofFieldType;
+};
 
 export interface FoldingSection {
   numFolds: NumericalFieldType;
@@ -80,10 +70,10 @@ export interface FoldingSection {
 }
 
 export type FullConfig = {
-  basic: BasicSection;
-  preferment?: PrefermentSection;
-  folding?: FoldingSection;
-  proving?: ProovingSection;
-  shaping?: ShapingSection;
-  baking: BakingSection;
+  basicSection: BasicSection;
+  prefermentSection?: PrefermentSection;
+  foldingSection?: FoldingSection;
+  provingSection: ProvingSection;
+  shapingSection?: ShapingSection;
+  bakingSection: BakingSection;
 };

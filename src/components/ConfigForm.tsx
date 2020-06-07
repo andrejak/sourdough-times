@@ -43,7 +43,7 @@ const ConfigForm = ({
         newConfig[key] = configs[method][key];
       }
     }
-    newConfig.basic.method = method;
+    newConfig.basicSection.method = method;
 
     setConfig(newConfig as FullConfig);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,7 +69,7 @@ const ConfigForm = ({
       <Form onSubmit={handleSubmit}>
         {Object.keys(config).map((section) => (
           <div key={section}>
-            <h2>{section}</h2>
+            <h2>{section.replace("Section", "")}</h2>
             {Object.keys(config[section]).map((fieldId) => {
               const field = config[section][fieldId];
               if (fieldId === "method") {
@@ -80,13 +80,17 @@ const ConfigForm = ({
                   key={fieldId}
                   field={field}
                   setValue={(newValue: number) => {
-                    setConfig({
+                    const newConfig = {
                       ...config,
                       [section]: {
                         ...config[section],
-                        [fieldId]: { ...section[fieldId], value: newValue },
+                        [fieldId]: {
+                          ...config[section][fieldId],
+                          value: newValue,
+                        },
                       },
-                    });
+                    };
+                    setConfig(newConfig);
                   }}
                 />
               );

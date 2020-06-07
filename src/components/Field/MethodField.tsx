@@ -34,7 +34,7 @@ const MethodField = ({
   setValue: (newValue: Method) => void;
 }): JSX.Element => (
   <VerticalContainer>
-    <Label>{field}</Label>
+    <Label>Method</Label>
     <div>
       {Object.keys(methodOptions).map((method: Method) => (
         <Option

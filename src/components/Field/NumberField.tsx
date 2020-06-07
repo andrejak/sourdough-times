@@ -44,7 +44,7 @@ const NumberField = ({
   setValue,
 }: {
   field: NumericalFieldType;
-  setValue: (newValue: number | moment.Duration | Range<number>) => void;
+  setValue: (newValue: number | Range<number>) => void;
 }): JSX.Element => {
   const [show, setShow] = React.useState(
     !field.optional || field.value === null
@@ -82,9 +82,8 @@ const NumberField = ({
                   from: parseInt(e.target.value),
                   to: parseInt(e.target.value),
                 });
-              } else if (field.type === "duration") {
-                setValue(parseInt(e.target.value));
               } else {
+                console.log("set to ", e.target.value);
                 setValue(parseInt(e.target.value));
               }
             }}

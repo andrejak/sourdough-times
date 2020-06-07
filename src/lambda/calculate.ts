@@ -67,11 +67,24 @@ const generateProvingInstructions = (
 
 const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
   try {
+    console.log("hello");
     const body: FullConfig = JSON.parse(event.body);
-    const eatingTime = moment(body.basic.target.value.toString());
-    const coolingTime = subtractMinutes(eatingTime, body.baking.cooling.value);
-    const bakingTime = subtractMinutes(coolingTime, body.baking.baking.value);
-    const preheatTime = subtractMinutes(bakingTime, body.baking.preheat.value);
+    const eatingTime = moment(body.basicSection.target.value.toString());
+    console.log("test", eatingTime);
+
+    const coolingTime = subtractMinutes(
+      eatingTime,
+      body.bakingSection.cooling.value
+    );
+    const bakingTime = subtractMinutes(
+      coolingTime,
+      body.bakingSection.baking.value
+    );
+    const preheatTime = subtractMinutes(
+      bakingTime,
+      body.bakingSection.preheat.value
+    );
+
     let steps: Step[] = [
       { when: eatingTime.toString(), instruction: "Eat the bread!" },
       {
@@ -81,19 +94,22 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       { when: bakingTime.toString(), instruction: "Put the bread in the oven" },
       { when: preheatTime.toString(), instruction: "Preheat the oven" },
     ];
+
     let methodStepTime = preheatTime.clone();
-    switch (body.basic.method) {
+
+    console.log("before");
+    switch (body.basicSection.method) {
       case "fold": {
         const folds = generateFoldInstructions(
-          body.folding.numFolds.value as number,
-          body.folding.timeBetweenFolds.value as number,
+          body.foldingSection.numFolds.value as number,
+          body.foldingSection.timeBetweenFolds.value as number,
           methodStepTime
         );
         methodStepTime = folds.methodStepTime;
         steps = steps.concat(folds.steps);
         const coldFermentationTime = subtractMinutes(
           methodStepTime,
-          body.proving.coldFermentation.value
+          body.provingSection.firstProof.value
         );
         steps.push({
           when: coldFermentationTime.toString(),
@@ -101,7 +117,7 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         });
         const bulkFermentationTime = subtractMinutes(
           coldFermentationTime,
-          body.proving.bulkFermentation.value
+          body.provingSection.secondProof.value
         );
         steps.push({
           when: bulkFermentationTime.toString(),
@@ -112,15 +128,15 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       }
       case "noKnead": {
         const folds = generateFoldInstructions(
-          body.folding.numFolds.value as number,
-          body.folding.timeBetweenFolds.value as number,
+          body.foldingSection.numFolds.value as number,
+          body.foldingSection.timeBetweenFolds.value as number,
           methodStepTime
         );
         methodStepTime = folds.methodStepTime;
         steps = steps.concat(folds.steps);
         const proofs = generateProvingInstructions(
-          body.proving.firstProof,
-          body.proving.secondProof,
+          body.provingSection.firstProof,
+          body.provingSection.secondProof,
           methodStepTime
         );
         methodStepTime = proofs.methodStepTime;
@@ -129,8 +145,8 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       }
       case "knead": {
         const proofs = generateProvingInstructions(
-          body.proving.firstProof,
-          body.proving.secondProof,
+          body.provingSection.firstProof,
+          body.provingSection.secondProof,
           methodStepTime
         );
         methodStepTime = proofs.methodStepTime;
@@ -138,10 +154,23 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         break;
       }
     }
-    if (body.preferment.autolyse.value != null) {
+    console.log("after");
+
+    if (body.prefermentSection.levain.value != null) {
+      const levainTime = subtractMinutes(
+        methodStepTime,
+        body.prefermentSection.levain.value
+      );
+      steps.push({
+        when: levainTime.toString(),
+        instruction: "Mix flour and water and leave to autolyse",
+      });
+      methodStepTime = levainTime.clone();
+    }
+    if (body.prefermentSection.autolyse.value != null) {
       const autolyseTime = subtractMinutes(
         methodStepTime,
-        body.preferment.autolyse.value
+        body.prefermentSection.autolyse.value
       );
       steps.push({
         when: autolyseTime.toString(),
@@ -149,14 +178,15 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       });
       methodStepTime = autolyseTime.clone();
     }
+
     const feedTime = subtractMinutes(
       methodStepTime,
-      (24 / (body.basic.numFeedsPerDay.value as number)) * 60
+      (24 / (body.basicSection.numFeedsPerDay.value as number)) * 60
     );
     steps.push({
       when: feedTime.toString(),
       instruction: `Feed the starter ${
-        body.basic.inFridge.value && "after taking it out of the fridge"
+        body.basicSection.inFridge.value && "after taking it out of the fridge"
       }`,
     });
 

@@ -4,6 +4,7 @@ import {
   NumericalFieldType,
   BasicSection,
   BakingSection,
+  ShapingSection,
   PrefermentSection,
   Method,
 } from "../types";
@@ -84,7 +85,7 @@ const initPrefermentSection: PrefermentSection = {
     step: 5,
   },
   levain: {
-    label: "levaiin",
+    label: "levain",
     help: "Mixing flour, water and starter before adding salt",
     type: "duration",
     value: null,
@@ -109,11 +110,11 @@ const initShapingSection: ShapingSection = {
 };
 
 export const initNoKneadConfig: FullConfig = {
-  basic: initBasicSection("noKnead"),
-  preferment: initPrefermentSection,
-  shaping: initShapingSection,
-  baking: initBakingSection,
-  folding: {
+  basicSection: initBasicSection("noKnead"),
+  prefermentSection: initPrefermentSection,
+  shapingSection: initShapingSection,
+  bakingSection: initBakingSection,
+  foldingSection: {
     numFolds: { label: "folds", type: "number", value: 2 },
     timeBetweenFolds: {
       label: "minutes between folds",
@@ -124,7 +125,7 @@ export const initNoKneadConfig: FullConfig = {
       step: 15,
     },
   },
-  proving: {
+  provingSection: {
     firstProof: {
       label: "First proof",
       help: "",
@@ -144,11 +145,11 @@ export const initNoKneadConfig: FullConfig = {
 };
 
 export const initKneadConfig: FullConfig = {
-  basic: initBasicSection("knead"),
-  preferment: initPrefermentSection,
-  shaping: initShapingSection,
-  baking: initBakingSection,
-  proving: {
+  basicSection: initBasicSection("knead"),
+  prefermentSection: initPrefermentSection,
+  shapingSection: initShapingSection,
+  bakingSection: initBakingSection,
+  provingSection: {
     firstProof: {
       label: "First proof",
       help: "",
@@ -165,10 +166,10 @@ export const initKneadConfig: FullConfig = {
 };
 
 export const initFoldConfig: FullConfig = {
-  basic: initBasicSection("fold"),
-  preferment: initPrefermentSection,
-  baking: initBakingSection,
-  folding: {
+  basicSection: initBasicSection("fold"),
+  prefermentSection: initPrefermentSection,
+  bakingSection: initBakingSection,
+  foldingSection: {
     numFolds: { label: "folds", type: "number", value: 4 },
     timeBetweenFolds: {
       label: "minutes between folds",
@@ -179,15 +180,15 @@ export const initFoldConfig: FullConfig = {
       step: 15,
     },
   },
-  proving: {
-    bulkFermentation: {
+  provingSection: {
+    firstProof: {
       label: "Bulk fermentation",
       help: "Range in hours",
       type: "proof",
       optional: true,
       value: { inFridge: fridgeField(false), duration: hourRangeField(1, 8) },
     },
-    coldFermentation: {
+    secondProof: {
       label: "Cold fermentation",
       help: "Range in hours",
       type: "proof",
