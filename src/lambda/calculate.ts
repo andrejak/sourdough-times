@@ -4,11 +4,9 @@ import {
   FullConfig,
   Step,
   ProofFieldType,
-  Range,
   NumberFieldType,
 } from "../types";
 import moment from "moment";
-import { minsInH } from "../state";
 
 const subtractMinutes = (time: moment.Moment, value: number) =>
   time.clone().subtract(value, "minutes");
@@ -40,8 +38,7 @@ const generateProvingInstructions = (
   secondProof: ProofFieldType,
   stepTime: moment.Moment
 ): Info => {
-  const secondFrom =
-    (secondProof.value.duration.value as Range<number>).from * minsInH;
+  const secondFrom = secondProof.value.duration.value.from;
   const secondProofTime = subtractMinutes(stepTime, secondFrom);
   const steps = [
     {
@@ -49,7 +46,7 @@ const generateProvingInstructions = (
       instruction: secondProof.instruction,
     },
   ];
-  const firstFrom = (firstProof.value.duration.value as Range<number>).from;
+  const firstFrom = firstProof.value.duration.value.from;
   const firstProofTime = subtractMinutes(secondProofTime, firstFrom);
   steps.push({
     when: firstProofTime.toISOString(),
@@ -102,13 +99,6 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
 
     switch (body.basicSection.method) {
       case "fold": {
-        const folds = generateFoldInstructions(
-          body.foldingSection.numFolds.value as number,
-          body.foldingSection.timeBetweenFolds.value as number,
-          stepTime
-        );
-        stepTime = folds.stepTime;
-        steps = steps.concat(folds.steps);
         const proofs = generateProvingInstructions(
           body.provingSection.firstProof,
           body.provingSection.secondProof,
@@ -116,6 +106,13 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         );
         stepTime = proofs.stepTime;
         steps = steps.concat(proofs.steps);
+        const folds = generateFoldInstructions(
+          body.foldingSection.numFolds.value as number,
+          body.foldingSection.timeBetweenFolds.value as number,
+          stepTime
+        );
+        stepTime = folds.stepTime;
+        steps = steps.concat(folds.steps);
         break;
       }
       case "noKnead": {

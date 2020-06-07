@@ -18,7 +18,7 @@ const Step = styled.div`
 `;
 
 const When = styled.span`
-  min-width: 90px;
+  min-width: 110px;
   font-weight: bold;
   margin-right: 0.5rem;
 `;
@@ -28,7 +28,7 @@ const Steps = ({ steps }: { steps: Step[] }): JSX.Element => (
     <Heading>Generated schedule</Heading>
     {steps.map((step, index) => (
       <Step key={index}>
-        <When>{moment(step.when).format("ddd HH:mm")}:</When>
+        <When>{moment(step.when).format("ddd HH:mm a")}:</When>
         <span>{step.instruction}</span>
       </Step>
     ))}
