@@ -13,6 +13,7 @@ type BaseFieldType = {
   label: string;
   help?: string;
   optional?: boolean;
+  instruction?: string;
 };
 
 export interface NumericalFieldType extends BaseFieldType {

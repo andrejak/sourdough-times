@@ -18,7 +18,7 @@ const Step = styled.div`
 `;
 
 const When = styled.span`
-  min-width: 80px;
+  min-width: 90px;
   font-weight: bold;
   margin-right: 0.5rem;
 `;
