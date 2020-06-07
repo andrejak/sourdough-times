@@ -16,6 +16,29 @@ const Form = styled.form`
   flex-direction: column;
 `;
 
+const Section = styled.div``;
+
+const Header = styled.h2`
+  margin: 0.5rem;
+  padding: 0;
+  font-size: 20px;
+`;
+
+const Button = styled.input`
+  align-self: center;
+  background-color: lightgray;
+  padding: 0.5rem;
+  border: none;
+  font-size: 16px;
+  width: 200px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: gray;
+    transition: all 100ms ease;
+  }
+`;
+
 const configs: { [key in Method]: FullConfig } = {
   knead: initKneadConfig,
   noKnead: initNoKneadConfig,
@@ -65,11 +88,13 @@ const ConfigForm = ({
 
   return (
     <Container>
-      <MethodField field={method} setValue={setMethod}></MethodField>
       <Form onSubmit={handleSubmit}>
+        <MethodField field={method} setValue={setMethod}></MethodField>
         {Object.keys(config).map((section) => (
-          <div key={section}>
-            <h2>{section.replace("Section", "")}</h2>
+          <Section key={section}>
+            {section != "basicSection" && (
+              <Header>{section.replace("Section", "")}</Header>
+            )}
             {Object.keys(config[section]).map((fieldId) => {
               const field = config[section][fieldId];
               if (fieldId === "method") {
@@ -95,9 +120,9 @@ const ConfigForm = ({
                 />
               );
             })}
-          </div>
+          </Section>
         ))}
-        <input type="submit" value="Submit" />
+        <Button type="submit" value="Generate instructions" />
       </Form>
     </Container>
   );

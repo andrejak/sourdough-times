@@ -14,7 +14,7 @@ const Steps = ({ steps }: { steps: Step[] }): JSX.Element => (
   <Container>
     {steps.map((step, index) => (
       <div key={index}>
-        {moment(step.when).format("dddd HH:mm")}: {step.instruction}
+        <b>{moment(step.when).format("dddd HH:mm")}</b>: {step.instruction}
       </div>
     ))}
   </Container>

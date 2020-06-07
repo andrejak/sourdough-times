@@ -7,9 +7,9 @@ import "./styles/global.css";
 
 const Container = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 100vw;
 `;
 

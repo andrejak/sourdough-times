@@ -47,16 +47,13 @@ const NumberField = ({
   setValue: (newValue: number | Range<number>) => void;
 }): JSX.Element => {
   const [show, setShow] = React.useState(
-    !field.optional || field.value === null
+    !field.optional || field.value !== null
   );
   let value = field.min || 1;
   if (field.value) {
     value = field.value as number;
     if (field.type === "range") {
       value = (field.value as Range<number>).from;
-    }
-    if (field.displayUnit === "h") {
-      value = value / minsInH;
     }
   }
 
@@ -83,12 +80,15 @@ const NumberField = ({
                   to: parseInt(e.target.value),
                 });
               } else {
-                console.log("set to ", e.target.value);
                 setValue(parseInt(e.target.value));
               }
             }}
           ></Input>
-          {!field.optional && <Label>{field.label}</Label>}
+          {!field.optional && (
+            <Label>
+              {field.type === "range" && value / minsInH} {field.label}
+            </Label>
+          )}
         </Container>
       )}
     </Container>

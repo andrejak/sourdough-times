@@ -2,15 +2,16 @@ import React from "react";
 import { Method } from "../../types";
 import styled from "styled-components";
 
-const VerticalContainer = styled.div`
+const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: left;
+  align-items: baseline;
   padding: 0.5rem;
 `;
 
 const Label = styled.label`
   font-size: 13px;
+  margin-bottom: 0.5rem;
+  padding: 0 0.5rem;
 `;
 
 const methodOptions: { [key in Method]: string } = {
@@ -21,9 +22,15 @@ const methodOptions: { [key in Method]: string } = {
 
 const Option = styled.span<{ selected: boolean }>`
   cursor: pointer;
-  border: 1px solid black;
-  padding: 0.2rem;
-  ${(props) => props.selected && "font-weight: bold"}
+  background-color: ${(props) => (props.selected ? "gray" : "lightgray")};
+  border: 1px solid gray;
+  padding: 0.2rem 0.5rem;
+
+  &:hover {
+    cursor: pointer;
+    background-color: gray;
+    transition: all 100ms ease;
+  }
 `;
 
 const MethodField = ({
@@ -33,8 +40,8 @@ const MethodField = ({
   field: Method;
   setValue: (newValue: Method) => void;
 }): JSX.Element => (
-  <VerticalContainer>
-    <Label>Method</Label>
+  <Container>
+    <Label>Method: </Label>
     <div>
       {Object.keys(methodOptions).map((method: Method) => (
         <Option
@@ -46,7 +53,7 @@ const MethodField = ({
         </Option>
       ))}
     </div>
-  </VerticalContainer>
+  </Container>
 );
 
 export default MethodField;

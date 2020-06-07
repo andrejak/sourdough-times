@@ -21,7 +21,7 @@ const fridgeField = (value: boolean): BooleanFieldType => ({
 const hourRangeField = (from: number, to: number): NumericalFieldType => ({
   label: "hours",
   type: "range",
-  value: { from, to },
+  value: { from: from * minsInH, to: to * minsInH },
   min: 1 * minsInH,
   max: 48 * minsInH,
   step: minsInH,
@@ -35,7 +35,7 @@ const initBasicSection = (method: Method): BasicSection => ({
     type: "datetime",
     value: moment().add(3, "d").set({ hour: 12, minute: 0 }),
   },
-  inFridge: fridgeField(true),
+  inFridge: { label: "currently in fridge", type: "boolean", value: true },
   numFeedsPerDay: {
     label: "feeds per day",
     help: "",
