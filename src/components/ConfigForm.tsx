@@ -1,11 +1,6 @@
 import React from "react";
-import { Step, BakeConfig, Method } from "../types";
-import {
-  initBaseConfig,
-  initKneadConfig,
-  initNoKneadConfig,
-  initFoldConfig,
-} from "../state";
+import { Step, FullConfig, Method } from "../types";
+import { initKneadConfig, initNoKneadConfig, initFoldConfig } from "../state";
 import styled from "styled-components";
 import Field from "./Field";
 import MethodField from "./Field/MethodField";
@@ -21,7 +16,7 @@ const Form = styled.form`
   flex-direction: column;
 `;
 
-const configs: { [key in Method]: BakeConfig } = {
+const configs: { [key in Method]: FullConfig } = {
   knead: initKneadConfig,
   noKnead: initNoKneadConfig,
   fold: initFoldConfig,
@@ -32,15 +27,13 @@ const ConfigForm = ({
 }: {
   setResult: (steps: Step[]) => void;
 }): JSX.Element => {
-  const [method, setMethod] = React.useState(
-    initBaseConfig.method.value as Method
-  );
+  const [method, setMethod] = React.useState("fold" as Method);
   const [config, setConfig] = React.useState(configs[method]);
 
   React.useEffect(() => {
     // Keep chosen values from previous config, but remove irrelevant fields and add new ones
     // OR: reset completely?
-    const newConfig: Partial<BakeConfig> = {};
+    const newConfig: Partial<FullConfig> = {};
     const oldKeys = Object.keys(config);
     const newKeys = Object.keys(configs[method]);
     for (const key of newKeys) {
@@ -50,9 +43,9 @@ const ConfigForm = ({
         newConfig[key] = configs[method][key];
       }
     }
-    newConfig.method.value = method;
+    newConfig.basic.method = method;
 
-    setConfig(newConfig as BakeConfig);
+    setConfig(newConfig as FullConfig);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method]);
 
@@ -72,29 +65,34 @@ const ConfigForm = ({
 
   return (
     <Container>
-      <MethodField
-        field={{ label: "Method", type: "method", value: method }}
-        setValue={setMethod}
-      ></MethodField>
+      <MethodField field={method} setValue={setMethod}></MethodField>
       <Form onSubmit={handleSubmit}>
-        {Object.keys(config).map((fieldId) => {
-          const field = config[fieldId];
-          if (fieldId === "method") {
-            return <span key={fieldId} />;
-          }
-          return (
-            <Field
-              key={fieldId}
-              field={field}
-              setValue={(newValue: number) => {
-                setConfig({
-                  ...config,
-                  [fieldId]: { ...config[fieldId], value: newValue },
-                });
-              }}
-            />
-          );
-        })}
+        {Object.keys(config).map((section) => (
+          <div key={section}>
+            <h2>{section}</h2>
+            {Object.keys(config[section]).map((fieldId) => {
+              const field = config[section][fieldId];
+              if (fieldId === "method") {
+                return <span key={fieldId} />;
+              }
+              return (
+                <Field
+                  key={fieldId}
+                  field={field}
+                  setValue={(newValue: number) => {
+                    setConfig({
+                      ...config,
+                      [section]: {
+                        ...config[section],
+                        [fieldId]: { ...section[fieldId], value: newValue },
+                      },
+                    });
+                  }}
+                />
+              );
+            })}
+          </div>
+        ))}
         <input type="submit" value="Submit" />
       </Form>
     </Container>

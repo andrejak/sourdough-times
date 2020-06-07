@@ -6,9 +6,8 @@ export type Range<T> = {
 };
 
 export type Method = "fold" | "knead" | "noKnead";
-export type BakeConfig = NoKneadConfig | KneadConfig | FoldConfig;
 
-export type FieldType = NumericalFieldType | OtherFieldType | ProofFieldType;
+export type FieldType = NumericalFieldType | BooleanFieldType | ProofFieldType;
 
 type BaseFieldType = {
   label: string;
@@ -33,43 +32,58 @@ export interface NumericalFieldType extends BaseFieldType {
 export interface ProofFieldType extends BaseFieldType {
   type: "proof";
   value: {
-    inFridge: OtherFieldType;
+    inFridge: BooleanFieldType;
     duration: NumericalFieldType;
   };
 }
 
-export interface OtherFieldType extends BaseFieldType {
-  type: "boolean" | "method";
-  value: boolean | Method;
+export interface BooleanFieldType extends BaseFieldType {
+  type: "boolean";
+  value: boolean;
 }
 
-export type BaseConfig = {
-  inFridge: FieldType;
-  numFeedsPerDay: FieldType;
+export type BasicSection = {
+  method: Method;
   target: FieldType;
-  autolyse: FieldType;
-  shaping: FieldType;
-  preheat: FieldType;
-  baking: FieldType;
-  cooling: FieldType;
-  method: FieldType;
+  inFridge: BooleanFieldType;
+  numFeedsPerDay: NumericalFieldType;
 };
 
-export interface FoldConfig extends BaseConfig {
-  numFolds: FieldType;
-  timeBetweenFolds: FieldType;
-  bulkFermentation: FieldType;
-  coldFermentation: FieldType;
+export type PrefermentSection = {
+  autolyse: NumericalFieldType;
+  levain: NumericalFieldType;
+};
+
+export type BakingSection = {
+  preheat: NumericalFieldType;
+  baking: NumericalFieldType;
+  cooling: NumericalFieldType;
+};
+
+export type ShapingSection = {
+  shaping: NumericalFieldType;
+};
+
+export type ProovingSection =
+  | {
+      firstProof: ProofFieldType;
+      secondProof: ProofFieldType;
+    }
+  | {
+      bulkFermentation: ProofFieldType;
+      coldFermentation: ProofFieldType;
+    };
+
+export interface FoldingSection {
+  numFolds: NumericalFieldType;
+  timeBetweenFolds: NumericalFieldType;
 }
 
-export interface KneadConfig extends BaseConfig {
-  firstProof: ProofFieldType;
-  secondProof: ProofFieldType;
-}
-
-export interface NoKneadConfig extends BaseConfig {
-  numFolds: FieldType;
-  timeBetweenFolds: FieldType;
-  firstProof: ProofFieldType;
-  secondProof: ProofFieldType;
-}
+export type FullConfig = {
+  basic: BasicSection;
+  preferment?: PrefermentSection;
+  folding?: FoldingSection;
+  proving?: ProovingSection;
+  shaping?: ShapingSection;
+  baking: BakingSection;
+};

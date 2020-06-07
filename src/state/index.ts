@@ -1,28 +1,21 @@
 import {
-  BakeConfig,
-  NoKneadConfig,
-  KneadConfig,
-  OtherFieldType,
+  FullConfig,
+  BooleanFieldType,
   NumericalFieldType,
-  FieldType,
-  BaseConfig,
-  FoldConfig,
+  BasicSection,
+  BakingSection,
+  PrefermentSection,
+  Method,
 } from "../types";
 import moment from "moment";
 
-const initMethod: FieldType = {
-  label: "Method",
-  type: "method",
-  value: "noKnead",
-};
+export const minsInH = 60;
 
-const fridgeField = (value: boolean): OtherFieldType => ({
+const fridgeField = (value: boolean): BooleanFieldType => ({
   label: "prove in fridge",
   type: "boolean",
   value,
 });
-
-export const minsInH = 60;
 
 const hourRangeField = (from: number, to: number): NumericalFieldType => ({
   label: "hours",
@@ -34,7 +27,7 @@ const hourRangeField = (from: number, to: number): NumericalFieldType => ({
   displayUnit: "h",
 });
 
-export const initBaseConfig: BaseConfig = {
+const initBasicSection = (method: Method): BasicSection => ({
   target: {
     label: "When do you want to eat the bread?",
     help: "",
@@ -50,27 +43,10 @@ export const initBaseConfig: BaseConfig = {
     min: 1,
     max: 4,
   },
-  method: initMethod,
-  autolyse: {
-    label: "autolyse",
-    help: "Mixing flour and water before adding salt",
-    type: "duration",
-    value: null,
-    optional: true,
-    min: 15,
-    max: 60,
-    step: 5,
-  },
-  shaping: {
-    label: "minutes rest after shaping",
-    help: "If you're not going straight from the fridge to the oven.",
-    type: "duration",
-    optional: true,
-    value: 20,
-    min: 10,
-    max: 180,
-    step: 10,
-  },
+  method,
+});
+
+const initBakingSection: BakingSection = {
   preheat: {
     label: "minutes to preheat the oven",
     type: "duration",
@@ -96,77 +72,126 @@ export const initBaseConfig: BaseConfig = {
   },
 };
 
-export const initNoKneadConfig: NoKneadConfig = {
-  method: { ...initMethod, value: "noKnead" },
-  numFolds: { label: "folds", type: "number", value: 2 },
-  timeBetweenFolds: {
-    label: "minutes between folds",
+const initPrefermentSection: PrefermentSection = {
+  autolyse: {
+    label: "autolyse",
+    help: "Mixing flour and water before adding salt",
     type: "duration",
-    value: 30,
+    value: null,
+    optional: true,
     min: 15,
     max: 60,
-    step: 15,
+    step: 5,
   },
-  firstProof: {
-    label: "First proof",
-    help: "",
-    type: "proof",
-    value: { inFridge: fridgeField(true), duration: hourRangeField(12, 24) },
+  levain: {
+    label: "levaiin",
+    help: "Mixing flour, water and starter before adding salt",
+    type: "duration",
+    value: null,
+    optional: true,
+    min: 15,
+    max: 60,
+    step: 5,
   },
-  secondProof: {
-    label: "Second proof",
-    help: "",
-    type: "proof",
-    value: {
-      inFridge: fridgeField(false),
-      duration: hourRangeField(1, 3),
+};
+
+const initShapingSection: ShapingSection = {
+  shaping: {
+    label: "minutes rest after shaping",
+    help: "If you're not going straight from the fridge to the oven.",
+    type: "duration",
+    optional: true,
+    value: 20,
+    min: 10,
+    max: 180,
+    step: 10,
+  },
+};
+
+export const initNoKneadConfig: FullConfig = {
+  basic: initBasicSection("noKnead"),
+  preferment: initPrefermentSection,
+  shaping: initShapingSection,
+  baking: initBakingSection,
+  folding: {
+    numFolds: { label: "folds", type: "number", value: 2 },
+    timeBetweenFolds: {
+      label: "minutes between folds",
+      type: "duration",
+      value: 30,
+      min: 15,
+      max: 60,
+      step: 15,
     },
   },
-  ...initBaseConfig,
+  proving: {
+    firstProof: {
+      label: "First proof",
+      help: "",
+      type: "proof",
+      value: { inFridge: fridgeField(true), duration: hourRangeField(12, 24) },
+    },
+    secondProof: {
+      label: "Second proof",
+      help: "",
+      type: "proof",
+      value: {
+        inFridge: fridgeField(false),
+        duration: hourRangeField(1, 3),
+      },
+    },
+  },
 };
 
-export const initKneadConfig: KneadConfig = {
-  method: { ...initMethod, value: "knead" },
-  firstProof: {
-    label: "First proof",
-    help: "",
-    type: "proof",
-    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
+export const initKneadConfig: FullConfig = {
+  basic: initBasicSection("knead"),
+  preferment: initPrefermentSection,
+  shaping: initShapingSection,
+  baking: initBakingSection,
+  proving: {
+    firstProof: {
+      label: "First proof",
+      help: "",
+      type: "proof",
+      value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
+    },
+    secondProof: {
+      label: "Second proof",
+      help: "",
+      type: "proof",
+      value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
+    },
   },
-  secondProof: {
-    label: "Second proof",
-    help: "",
-    type: "proof",
-    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
-  },
-  ...initBaseConfig,
 };
 
-export const initFoldConfig: FoldConfig = {
-  method: { ...initMethod, value: "fold" },
-  numFolds: { label: "folds", type: "number", value: 4 },
-  timeBetweenFolds: {
-    label: "minutes between folds",
-    type: "duration",
-    value: 30,
-    min: 15,
-    max: 60,
-    step: 15,
+export const initFoldConfig: FullConfig = {
+  basic: initBasicSection("fold"),
+  preferment: initPrefermentSection,
+  baking: initBakingSection,
+  folding: {
+    numFolds: { label: "folds", type: "number", value: 4 },
+    timeBetweenFolds: {
+      label: "minutes between folds",
+      type: "duration",
+      value: 30,
+      min: 15,
+      max: 60,
+      step: 15,
+    },
   },
-  bulkFermentation: {
-    label: "Bulk fermentation",
-    help: "Range in hours",
-    type: "proof",
-    optional: true,
-    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 8) },
+  proving: {
+    bulkFermentation: {
+      label: "Bulk fermentation",
+      help: "Range in hours",
+      type: "proof",
+      optional: true,
+      value: { inFridge: fridgeField(false), duration: hourRangeField(1, 8) },
+    },
+    coldFermentation: {
+      label: "Cold fermentation",
+      help: "Range in hours",
+      type: "proof",
+      value: { inFridge: fridgeField(true), duration: hourRangeField(8, 24) },
+    },
   },
-  coldFermentation: {
-    label: "Cold fermentation",
-    help: "Range in hours",
-    type: "proof",
-    value: { inFridge: fridgeField(true), duration: hourRangeField(8, 24) },
-  },
-  ...initBaseConfig,
 };
-
-export const initState: BakeConfig = initKneadConfig;

@@ -1,5 +1,5 @@
 import React from "react";
-import { OtherFieldType, Method } from "../../types";
+import { Method } from "../../types";
 import styled from "styled-components";
 
 const VerticalContainer = styled.div`
@@ -30,16 +30,16 @@ const MethodField = ({
   field,
   setValue,
 }: {
-  field: OtherFieldType;
+  field: Method;
   setValue: (newValue: Method) => void;
 }): JSX.Element => (
   <VerticalContainer>
-    <Label>{field.label}</Label>
+    <Label>{field}</Label>
     <div>
       {Object.keys(methodOptions).map((method: Method) => (
         <Option
           key={method}
-          selected={field.value === method}
+          selected={field === method}
           onClick={() => setValue(method)}
         >
           {methodOptions[method]}
