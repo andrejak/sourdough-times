@@ -1,5 +1,5 @@
 import React from "react";
-import { OtherFieldType } from "../../types";
+import { BooleanFieldType } from "../../types";
 import styled from "styled-components";
 
 const HorizontalContainer = styled.div`
@@ -8,9 +8,7 @@ const HorizontalContainer = styled.div`
   height: 40px;
 `;
 
-const Label = styled.label`
-  font-size: 13px;
-`;
+const Label = styled.label``;
 
 const Input = styled.input`
   width: 40px;
@@ -20,7 +18,7 @@ const CheckboxField = ({
   field,
   setValue,
 }: {
-  field: OtherFieldType;
+  field: BooleanFieldType;
   setValue: (newValue: boolean) => void;
 }): JSX.Element => (
   <HorizontalContainer>

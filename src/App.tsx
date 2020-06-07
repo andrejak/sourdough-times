@@ -4,6 +4,13 @@ import styled from "styled-components";
 import Steps from "./components/Steps";
 import ConfigForm from "./components/ConfigForm";
 import "./styles/global.css";
+import Footer from "./components/Footer";
+
+const Page = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 100vh;
+`;
 
 const Container = styled.div`
   display: flex;
@@ -13,13 +20,18 @@ const Container = styled.div`
   width: 100vw;
 `;
 
-const Page: React.FC = () => {
+const App: React.FC = () => {
   const [result, setResult] = React.useState([] as Step[]);
   return (
-    <Container>
-      <ConfigForm setResult={(steps: Step[]) => setResult(steps)}></ConfigForm>
-      <Steps steps={result} />
-    </Container>
+    <Page>
+      <Container>
+        <ConfigForm
+          setResult={(steps: Step[]) => setResult(steps)}
+        ></ConfigForm>
+        <Steps steps={result} />
+      </Container>
+      <Footer />
+    </Page>
   );
 };
-export default Page;
+export default App;

@@ -40,7 +40,6 @@ export interface BooleanFieldType extends BaseFieldType {
 export type BasicSection = {
   method: Method;
   target: FieldType;
-  inFridge: BooleanFieldType;
   numFeedsPerDay: NumericalFieldType;
 };
 

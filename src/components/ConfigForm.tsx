@@ -4,11 +4,13 @@ import { initKneadConfig, initNoKneadConfig, initFoldConfig } from "../state";
 import styled from "styled-components";
 import Field from "./Field";
 import MethodField from "./Field/MethodField";
+import { Heading } from "./Heading";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 1rem;
+  max-width: 450px;
 `;
 
 const Form = styled.form`
@@ -17,12 +19,6 @@ const Form = styled.form`
 `;
 
 const Section = styled.div``;
-
-const Header = styled.h2`
-  margin: 0.5rem;
-  padding: 0;
-  font-size: 20px;
-`;
 
 const Button = styled.input`
   align-self: center;
@@ -93,7 +89,7 @@ const ConfigForm = ({
         {Object.keys(config).map((section) => (
           <Section key={section}>
             {section != "basicSection" && (
-              <Header>{section.replace("Section", "")}</Header>
+              <Heading>{section.replace("Section", "").toUpperCase()}</Heading>
             )}
             {Object.keys(config[section]).map((fieldId) => {
               const field = config[section][fieldId];

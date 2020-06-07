@@ -107,23 +107,15 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         );
         methodStepTime = folds.methodStepTime;
         steps = steps.concat(folds.steps);
-        const coldFermentationTime = subtractMinutes(
-          methodStepTime,
-          body.provingSection.firstProof.value
+        const proofs = generateProvingInstructions(
+          body.provingSection.firstProof,
+          body.provingSection.secondProof,
+          methodStepTime
         );
-        steps.push({
-          when: coldFermentationTime.toISOString(),
-          instruction: "Put it in the fridge to cold ferment",
-        });
-        const bulkFermentationTime = subtractMinutes(
-          coldFermentationTime,
-          body.provingSection.secondProof.value
-        );
-        steps.push({
-          when: bulkFermentationTime.toISOString(),
-          instruction: "Leave it out to bulk ferment",
-        });
-        methodStepTime = bulkFermentationTime.clone();
+        methodStepTime = proofs.methodStepTime;
+        steps = steps.concat(proofs.steps);
+        // "Put it in the fridge to cold ferment"
+        // "Leave it out to bulk ferment"
         break;
       }
       case "noKnead": {
@@ -162,7 +154,7 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       );
       steps.push({
         when: levainTime.toISOString(),
-        instruction: "Mix flour and water and leave to autolyse",
+        instruction: "Mix flour, water and starter for the levain",
       });
       methodStepTime = levainTime.clone();
     }
@@ -184,9 +176,7 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
     );
     steps.push({
       when: feedTime.toISOString(),
-      instruction: `Feed the starter ${
-        body.basicSection.inFridge.value && "after taking it out of the fridge"
-      }`,
+      instruction: `Feed the starter and leave it outside the fridge`,
     });
 
     return {

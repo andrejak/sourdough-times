@@ -7,18 +7,23 @@ import { minsInH } from "../../state";
 
 const Container = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 0 0.5rem;
   height: 40px;
 `;
 
 const Label = styled.label`
-  font-size: 13px;
   padding: 0 0.5rem;
 `;
 
 const Input = styled.input`
   width: 40px;
+  margin: 0 0.5rem;
+`;
+
+const DateTimeContainer = styled.div`
+  padding: 0 0.5rem;
 `;
 
 export const DatetimeField = ({
@@ -27,17 +32,30 @@ export const DatetimeField = ({
 }: {
   field: NumericalFieldType;
   setValue: (newValue: moment.Moment) => void;
-}): JSX.Element => (
-  <Container>
-    <Label>{field.label}</Label>
-    <input
-      type="datetime-local"
-      // <input type="date" name="myDate" min="2013-06-01" max="2013-08-31" step="7" id="myDate">
-      value={field.value.toString()}
-      onChange={(e) => setValue(moment(e.target.value))}
-    ></input>
-  </Container>
-);
+}): JSX.Element => {
+  const date = (field.value as moment.Moment).format("YYYY-MM-DD");
+  const time = (field.value as moment.Moment).format("hh:mm");
+  console.log(date, time);
+  return (
+    <Container>
+      <Label>{field.label}</Label>
+      <DateTimeContainer>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setValue(moment(e.target.value + " " + time))}
+          required
+        ></input>
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setValue(moment(date + " " + e.target.value))}
+          required
+        ></input>
+      </DateTimeContainer>
+    </Container>
+  );
+};
 
 const NumberField = ({
   field,
@@ -62,11 +80,19 @@ const NumberField = ({
       {field.optional && (
         <CheckboxField
           field={{ type: "boolean", value: show, label: field.label }}
-          setValue={setShow}
+          setValue={(checked) => {
+            if (show) {
+              setValue(null);
+            } else {
+              setValue(value);
+            }
+            setShow(checked);
+          }}
         />
       )}
       {show && (
         <Container>
+          {field.optional && "for"}
           <Input
             type={field.type === "range" ? "range" : "number"}
             min={field.min}
@@ -89,6 +115,7 @@ const NumberField = ({
               {field.type === "range" && value / minsInH} {field.label}
             </Label>
           )}
+          {field.optional && "minutes"}
         </Container>
       )}
     </Container>

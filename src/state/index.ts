@@ -35,9 +35,8 @@ const initBasicSection = (method: Method): BasicSection => ({
     type: "datetime",
     value: moment().add(3, "d").set({ hour: 12, minute: 0 }),
   },
-  inFridge: { label: "currently in fridge", type: "boolean", value: true },
   numFeedsPerDay: {
-    label: "feeds per day",
+    label: "How many times a day you usually feed it",
     help: "",
     type: "number",
     value: 1,
@@ -64,7 +63,7 @@ const initBakingSection: BakingSection = {
     max: 60,
   },
   cooling: {
-    label: "minutes to cool",
+    label: "let cool",
     type: "duration",
     value: 120,
     min: 0,
@@ -115,7 +114,7 @@ export const initNoKneadConfig: FullConfig = {
   shapingSection: initShapingSection,
   bakingSection: initBakingSection,
   foldingSection: {
-    numFolds: { label: "folds", type: "number", value: 2 },
+    numFolds: { label: "folds", type: "number", value: 2, min: 0, max: 10 },
     timeBetweenFolds: {
       label: "minutes between folds",
       type: "duration",
@@ -170,7 +169,7 @@ export const initFoldConfig: FullConfig = {
   prefermentSection: initPrefermentSection,
   bakingSection: initBakingSection,
   foldingSection: {
-    numFolds: { label: "folds", type: "number", value: 4 },
+    numFolds: { label: "folds", type: "number", value: 4, min: 1, max: 10 },
     timeBetweenFolds: {
       label: "minutes between folds",
       type: "duration",
