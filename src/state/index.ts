@@ -7,6 +7,10 @@ import {
   PrefermentSection,
   Method,
   RangeFieldType,
+  ProvingSection,
+  FoldingSection,
+  SectionId,
+  Section,
 } from "../types";
 import moment from "moment";
 
@@ -117,40 +121,86 @@ const initShapingSection: ShapingSection = {
   },
 };
 
+const initFoldingSection = (num: number): FoldingSection => ({
+  numFolds: { label: "folds", type: "number", value: num, min: 0, max: 10 },
+  timeBetweenFolds: {
+    label: "minutes between folds",
+    type: "number",
+    value: 30,
+    min: 15,
+    max: 60,
+    step: 15,
+    instruction: "Perform another fold",
+  },
+});
+
+const initProvingSection = (
+  fridge: boolean,
+  from: number,
+  to: number
+): ProvingSection => ({
+  firstProof: {
+    label: "First proof",
+    help: "",
+    type: "proof",
+    value: {
+      inFridge: fridgeField(fridge),
+      duration: hourRangeField(from, to),
+    },
+    instruction: "Start the first proving",
+  },
+  secondProof: {
+    label: "Second proof",
+    help: "",
+    type: "proof",
+    value: {
+      inFridge: fridgeField(false),
+      duration: hourRangeField(1, 3),
+    },
+    instruction: "Start the second proving",
+  },
+});
+
+const initBulkFermentSection: ProvingSection = {
+  firstProof: {
+    label: "Bulk fermentation",
+    help: "Range in hours",
+    type: "proof",
+    value: { inFridge: fridgeField(false), duration: hourRangeField(1, 8) },
+    instruction: "Leave it out to bulk ferment",
+  },
+  secondProof: {
+    label: "Cold fermentation",
+    help: "Range in hours",
+    type: "proof",
+    value: { inFridge: fridgeField(true), duration: hourRangeField(8, 24) },
+    instruction: "Put it in the fridge to cold ferment",
+  },
+};
+
+export const initSections: { [key in SectionId]: Section } = {
+  [SectionId.Basic]: initBasicSection("noKnead"),
+  [SectionId.Preferment]: initPrefermentSection,
+  [SectionId.Folding]: initFoldingSection(2),
+  [SectionId.Proving]: initProvingSection(true, 8, 24),
+  [SectionId.Shaping]: initShapingSection,
+  [SectionId.Baking]: initBakingSection,
+  [SectionId.BulkFerment]: initBulkFermentSection,
+};
+
+const pre = [SectionId.Basic, SectionId.Preferment];
+const post = [SectionId.Shaping, SectionId.Baking];
+export const sectionsPerMethod: { [key in Method]: SectionId[] } = {
+  noKnead: [...pre, SectionId.Folding, SectionId.Proving, ...post],
+  knead: [...pre, SectionId.Proving, ...post],
+  fold: [...pre, SectionId.Folding, SectionId.BulkFerment, SectionId.Baking],
+};
+
 export const initNoKneadConfig: FullConfig = {
   basicSection: initBasicSection("noKnead"),
   prefermentSection: initPrefermentSection,
-  foldingSection: {
-    numFolds: { label: "folds", type: "number", value: 2, min: 0, max: 10 },
-    timeBetweenFolds: {
-      label: "minutes between folds",
-      type: "number",
-      value: 30,
-      min: 15,
-      max: 60,
-      step: 15,
-      instruction: "Perform another fold",
-    },
-  },
-  provingSection: {
-    firstProof: {
-      label: "First proof",
-      help: "",
-      type: "proof",
-      value: { inFridge: fridgeField(true), duration: hourRangeField(12, 24) },
-      instruction: "Start the first proving",
-    },
-    secondProof: {
-      label: "Second proof",
-      help: "",
-      type: "proof",
-      value: {
-        inFridge: fridgeField(false),
-        duration: hourRangeField(1, 3),
-      },
-      instruction: "Start the second proving",
-    },
-  },
+  foldingSection: initFoldingSection(2),
+  provingSection: initProvingSection(true, 8, 24),
   shapingSection: initShapingSection,
   bakingSection: initBakingSection,
 };
@@ -158,22 +208,7 @@ export const initNoKneadConfig: FullConfig = {
 export const initKneadConfig: FullConfig = {
   basicSection: initBasicSection("knead"),
   prefermentSection: initPrefermentSection,
-  provingSection: {
-    firstProof: {
-      label: "First proof",
-      help: "",
-      type: "proof",
-      value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
-      instruction: "Start the fisrst proving",
-    },
-    secondProof: {
-      label: "Second proof",
-      help: "",
-      type: "proof",
-      value: { inFridge: fridgeField(false), duration: hourRangeField(1, 3) },
-      instruction: "Start the second proving",
-    },
-  },
+  provingSection: initProvingSection(false, 1, 3),
   shapingSection: initShapingSection,
   bakingSection: initBakingSection,
 };
@@ -181,33 +216,7 @@ export const initKneadConfig: FullConfig = {
 export const initFoldConfig: FullConfig = {
   basicSection: initBasicSection("fold"),
   prefermentSection: initPrefermentSection,
+  foldingSection: initFoldingSection(4),
+  provingSection: initBulkFermentSection,
   bakingSection: initBakingSection,
-  foldingSection: {
-    numFolds: { label: "folds", type: "number", value: 4, min: 1, max: 10 },
-    timeBetweenFolds: {
-      label: "minutes between folds",
-      type: "number",
-      value: 30,
-      min: 15,
-      max: 60,
-      step: 15,
-      instruction: "Perform another fold",
-    },
-  },
-  provingSection: {
-    firstProof: {
-      label: "Bulk fermentation",
-      help: "Range in hours",
-      type: "proof",
-      value: { inFridge: fridgeField(false), duration: hourRangeField(1, 8) },
-      instruction: "Leave it out to bulk ferment",
-    },
-    secondProof: {
-      label: "Cold fermentation",
-      help: "Range in hours",
-      type: "proof",
-      value: { inFridge: fridgeField(true), duration: hourRangeField(8, 24) },
-      instruction: "Put it in the fridge to cold ferment",
-    },
-  },
 };

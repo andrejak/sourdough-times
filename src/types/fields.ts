@@ -5,8 +5,6 @@ export type Range<T> = {
   to: T;
 };
 
-export type Method = "fold" | "knead" | "noKnead";
-
 export type FieldType =
   | DateTimeFieldType
   | NumberFieldType
@@ -55,43 +53,3 @@ export interface BooleanFieldType extends BaseFieldType {
   type: "boolean";
   value: boolean;
 }
-
-export type BasicSection = {
-  method: Method;
-  target: FieldType;
-  numFeedsPerDay: NumberFieldType;
-};
-
-export type PrefermentSection = {
-  autolyse: NumberFieldType;
-  levain: NumberFieldType;
-};
-
-export type BakingSection = {
-  preheat: NumberFieldType;
-  baking: NumberFieldType;
-  cooling: NumberFieldType;
-};
-
-export type ShapingSection = {
-  shaping: NumberFieldType;
-};
-
-export type ProvingSection = {
-  firstProof: ProofFieldType;
-  secondProof: ProofFieldType;
-};
-
-export interface FoldingSection {
-  numFolds: NumberFieldType;
-  timeBetweenFolds: NumberFieldType;
-}
-
-export type FullConfig = {
-  basicSection: BasicSection;
-  prefermentSection?: PrefermentSection;
-  foldingSection?: FoldingSection;
-  provingSection: ProvingSection;
-  shapingSection?: ShapingSection;
-  bakingSection: BakingSection;
-};
