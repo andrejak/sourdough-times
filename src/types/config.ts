@@ -27,6 +27,7 @@ export interface NumericalFieldType extends BaseFieldType {
   min?: number;
   max?: number;
   step?: number;
+  displayUnit?: "min" | "h";
 }
 
 export interface ProofFieldType extends BaseFieldType {

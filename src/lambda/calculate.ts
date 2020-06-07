@@ -7,8 +7,10 @@ import {
   FoldConfig,
   Step,
   ProofFieldType,
+  Range,
 } from "../types";
 import moment from "moment";
+import { minsInH } from "../state";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const subtractMinutes = (time: moment.Moment, value: any) =>
@@ -41,10 +43,9 @@ const generateProvingInstructions = (
   secondProof: ProofFieldType,
   methodStepTime: moment.Moment
 ): Info => {
-  const secondProofTime = subtractMinutes(
-    methodStepTime,
-    secondProof.value.duration.value
-  );
+  const secondFrom =
+    (secondProof.value.duration.value as Range<number>).from * minsInH;
+  const secondProofTime = subtractMinutes(methodStepTime, secondFrom);
   const steps = [
     {
       when: secondProofTime.toString(),
@@ -53,10 +54,8 @@ const generateProvingInstructions = (
       }`,
     },
   ];
-  const firstProofTime = subtractMinutes(
-    secondProofTime,
-    firstProof.value.duration.value
-  );
+  const firstFrom = (firstProof.value.duration.value as Range<number>).from;
+  const firstProofTime = subtractMinutes(secondProofTime, firstFrom);
   steps.push({
     when: firstProofTime.toString(),
     instruction: `Start the first proving ${
@@ -123,8 +122,8 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         methodStepTime = folds.methodStepTime;
         steps = steps.concat(folds.steps);
         const proofs = generateProvingInstructions(
-          (body as KneadConfig).firstProof,
-          (body as KneadConfig).secondProof,
+          (body as NoKneadConfig).firstProof,
+          (body as NoKneadConfig).secondProof,
           methodStepTime
         );
         methodStepTime = proofs.methodStepTime;

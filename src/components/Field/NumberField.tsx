@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { NumericalFieldType, Range } from "../../types";
 import moment from "moment";
 import CheckboxField from "./CheckboxField";
+import { minsInH } from "../../state";
 
 const Container = styled.div`
   display: flex;
@@ -50,16 +51,12 @@ const NumberField = ({
   );
   let value = field.min || 1;
   if (field.value) {
-    switch (field.type) {
-      case "number":
-        value = field.value as number;
-        break;
-      case "duration":
-        value = field.value as number;
-        break;
-      case "range":
-        value = (field.value as Range<number>).from;
-        break;
+    value = field.value as number;
+    if (field.type === "range") {
+      value = (field.value as Range<number>).from;
+    }
+    if (field.displayUnit === "h") {
+      value = value / minsInH;
     }
   }
 

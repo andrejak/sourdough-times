@@ -22,12 +22,16 @@ const fridgeField = (value: boolean): OtherFieldType => ({
   value,
 });
 
+export const minsInH = 60;
+
 const hourRangeField = (from: number, to: number): NumericalFieldType => ({
   label: "hours",
   type: "range",
   value: { from, to },
-  min: 1,
-  max: 48,
+  min: 1 * minsInH,
+  max: 48 * minsInH,
+  step: minsInH,
+  displayUnit: "h",
 });
 
 export const initBaseConfig: BaseConfig = {
@@ -83,9 +87,11 @@ export const initBaseConfig: BaseConfig = {
     max: 60,
   },
   cooling: {
-    label: "hours to cool",
+    label: "minutes to cool",
     type: "duration",
     value: 120,
+    min: 0,
+    step: 30,
     optional: true,
   },
 };

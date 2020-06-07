@@ -38,8 +38,21 @@ const ConfigForm = ({
   const [config, setConfig] = React.useState(configs[method]);
 
   React.useEffect(() => {
-    // TODO remove unneeded properties
-    setConfig({ ...configs[method], ...config });
+    // Keep chosen values from previous config, but remove irrelevant fields and add new ones
+    // OR: reset completely?
+    const newConfig: Partial<BakeConfig> = {};
+    const oldKeys = Object.keys(config);
+    const newKeys = Object.keys(configs[method]);
+    for (const key of newKeys) {
+      if (oldKeys.includes(key)) {
+        newConfig[key] = config[key];
+      } else {
+        newConfig[key] = configs[method][key];
+      }
+    }
+    newConfig.method.value = method;
+
+    setConfig(newConfig as BakeConfig);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method]);
 
