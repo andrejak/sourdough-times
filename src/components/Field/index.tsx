@@ -23,8 +23,11 @@ const Field = ({
   setValue: (newValue: any) => void;
 }): JSX.Element => {
   const Component = mapTypeToComponent[field.type];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Component field={field as any} setValue={setValue} />;
+  return React.useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => <Component field={field as any} setValue={setValue} />,
+    [field]
+  );
 };
 
 export default Field;

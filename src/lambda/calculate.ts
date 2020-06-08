@@ -5,6 +5,7 @@ import {
   Step,
   ProofFieldType,
   NumberFieldType,
+  SectionId,
 } from "../types";
 import moment from "moment";
 
@@ -72,43 +73,43 @@ const generateStep = (field: NumberFieldType, stepTime: moment.Moment) => {
 const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
   try {
     const body: FullConfig = JSON.parse(event.body);
-    const eatingTime = moment(body.basicSection.target.value.toString());
+    const eatingTime = moment(body[SectionId.Basic].target.value.toString());
     let steps: Step[] = [
       {
         when: eatingTime.toISOString(),
-        instruction: body.basicSection.target.instruction,
+        instruction: body[SectionId.Basic].target.instruction,
       },
     ];
 
     const { stepTime: coolingTime, step: coolingStep } = generateStep(
-      body.bakingSection.cooling,
+      body[SectionId.Baking].cooling,
       eatingTime
     );
     steps.push(coolingStep);
     const { stepTime: bakingTime, step: bakingStep } = generateStep(
-      body.bakingSection.baking,
+      body[SectionId.Baking].baking,
       coolingTime
     );
     steps.push(bakingStep);
     // eslint-disable-next-line prefer-const
     let { stepTime, step: preheatStep } = generateStep(
-      body.bakingSection.preheat,
+      body[SectionId.Baking].preheat,
       bakingTime
     );
     steps.push(preheatStep);
 
-    switch (body.basicSection.method) {
+    switch (body[SectionId.Basic].method) {
       case "fold": {
         const proofs = generateProvingInstructions(
-          body.provingSection.firstProof,
-          body.provingSection.secondProof,
+          body[SectionId.BulkFerment].firstProof,
+          body[SectionId.BulkFerment].secondProof,
           stepTime
         );
         stepTime = proofs.stepTime;
         steps = steps.concat(proofs.steps);
         const folds = generateFoldInstructions(
-          body.foldingSection.numFolds.value as number,
-          body.foldingSection.timeBetweenFolds.value as number,
+          body[SectionId.Folding].numFolds.value as number,
+          body[SectionId.Folding].timeBetweenFolds.value as number,
           stepTime
         );
         stepTime = folds.stepTime;
@@ -117,15 +118,15 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       }
       case "noKnead": {
         const folds = generateFoldInstructions(
-          body.foldingSection.numFolds.value as number,
-          body.foldingSection.timeBetweenFolds.value as number,
+          body[SectionId.Folding].numFolds.value as number,
+          body[SectionId.Folding].timeBetweenFolds.value as number,
           stepTime
         );
         stepTime = folds.stepTime;
         steps = steps.concat(folds.steps);
         const proofs = generateProvingInstructions(
-          body.provingSection.firstProof,
-          body.provingSection.secondProof,
+          body[SectionId.Proving].firstProof,
+          body[SectionId.Proving].secondProof,
           stepTime
         );
         stepTime = proofs.stepTime;
@@ -134,8 +135,8 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       }
       case "knead": {
         const proofs = generateProvingInstructions(
-          body.provingSection.firstProof,
-          body.provingSection.secondProof,
+          body[SectionId.Proving].firstProof,
+          body[SectionId.Proving].secondProof,
           stepTime
         );
         stepTime = proofs.stepTime;
@@ -144,17 +145,17 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       }
     }
 
-    if (body.prefermentSection.levain.value != null) {
+    if (body[SectionId.Preferment].levain.value != null) {
       const { stepTime: levainTime, step: levainStep } = generateStep(
-        body.prefermentSection.levain,
+        body[SectionId.Preferment].levain,
         stepTime
       );
       steps.push(levainStep);
       stepTime = levainTime.clone();
     }
-    if (body.prefermentSection.autolyse.value != null) {
+    if (body[SectionId.Preferment].autolyse.value != null) {
       const { stepTime: autolyseTime, step: autolyseStep } = generateStep(
-        body.prefermentSection.levain,
+        body[SectionId.Preferment].levain,
         stepTime
       );
       steps.push(autolyseStep);
@@ -163,11 +164,11 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
 
     const feedTime = subtractMinutes(
       stepTime,
-      (24 / (body.basicSection.numFeedsPerDay.value as number)) * 60
+      (24 / (body[SectionId.Basic].numFeedsPerDay.value as number)) * 60
     );
     steps.push({
       when: feedTime.toISOString(),
-      instruction: body.basicSection.numFeedsPerDay.instruction,
+      instruction: body[SectionId.Basic].numFeedsPerDay.instruction,
     });
 
     return {

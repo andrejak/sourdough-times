@@ -4,8 +4,9 @@ import styled from "styled-components";
 import MethodField from "./Field/MethodField";
 import Section from "./Section";
 import Button from "./Button";
-import { useForm } from "../state/useForm";
+import { FormContext } from "../state/context";
 import { sectionsPerMethod } from "../state";
+import produce from "immer";
 
 const Container = styled.div`
   display: flex;
@@ -24,11 +25,14 @@ const ConfigForm = ({
 }: {
   setResult: (steps: Step[]) => void;
 }): JSX.Element => {
-  const { method, setMethod, sections } = useForm();
+  //const { method, setMethod, sections } = useForm();
+  const { sections, setConfig } = React.useContext(FormContext);
+  const method = sections[SectionId.Basic].method;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const config = sections; // TODO
+    console.log(config);
     const response = await fetch("/.netlify/functions/calculate", {
       body: JSON.stringify(config),
       method: "POST",
@@ -44,14 +48,17 @@ const ConfigForm = ({
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <MethodField field={method} setValue={setMethod}></MethodField>
+        <MethodField
+          field={method}
+          setValue={(newValue) => {
+            const newConfig = produce((draft) => {
+              draft[SectionId.Basic].method = newValue;
+            });
+            setConfig(newConfig);
+          }}
+        />
         {sectionsPerMethod[method].map((section: SectionId) => (
-          <Section
-            key={section}
-            sectionId={section}
-            section={sections[section].config}
-            setConfig={sections[section].setConfig}
-          />
+          <Section key={section} sectionId={section} />
         ))}
         <Button />
       </Form>

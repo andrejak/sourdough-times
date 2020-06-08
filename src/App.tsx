@@ -5,6 +5,7 @@ import Steps from "./components/Steps";
 import ConfigForm from "./components/ConfigForm";
 import "./styles/global.css";
 import Footer from "./components/Footer";
+import { FormProvider } from "./state/context";
 
 const Page = styled.div`
   display: flex;
@@ -27,9 +28,11 @@ const App: React.FC = () => {
   return (
     <Page>
       <Container>
-        <ConfigForm
-          setResult={(steps: Step[]) => setResult(steps)}
-        ></ConfigForm>
+        <FormProvider>
+          <ConfigForm
+            setResult={(steps: Step[]) => setResult(steps)}
+          ></ConfigForm>
+        </FormProvider>
         <Steps steps={result} />
       </Container>
       <Footer />
