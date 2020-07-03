@@ -8,29 +8,116 @@ import {
   SectionId,
 } from "../types";
 import moment from "moment";
+import * as _ from "lodash";
+
+const dateFormat = "YYYY-MM-DD";
+const timeFormat = "HH:mm";
+const datetimeFormat = `${dateFormat} ${timeFormat}`;
+const midnight = moment("24:00", timeFormat).subtract(1, "day");
+
+// TODO make dynamic
+const restrictedBoundaries = [
+  { from: "13:00", to: "15:00" },
+  { from: "23:00", to: "07:00" },
+];
+const restrictedPeriods = restrictedBoundaries.map(({ from, to }) => ({
+  from:
+    from > to
+      ? moment(from, timeFormat).subtract(1, "day")
+      : moment(from, timeFormat),
+  to: moment(to, timeFormat),
+}));
 
 const subtractMinutes = (time: moment.Moment, value: number) =>
   time.clone().subtract(value, "minutes");
 
 type Info = { stepTime: moment.Moment; steps: Step[] };
 
+const nextValidTarget = (target: moment.Moment) => {
+  let result = target;
+  const justTime = moment(target.format(timeFormat), timeFormat);
+  for (const period of restrictedPeriods) {
+    if (justTime.isBetween(period.from, period.to)) {
+      const justDate = midnight.isBetween(period.from, period.to)
+        ? moment(target.subtract(1, "day")).format(dateFormat)
+        : target.format(dateFormat);
+      result = moment(
+        justDate + " " + subtractMinutes(period.from, 5).format(timeFormat),
+        datetimeFormat
+      );
+    }
+  }
+  return result;
+};
+
+const generateStep = (field: NumberFieldType, stepTime: moment.Moment) => {
+  const target = nextValidTarget(subtractMinutes(stepTime, field.value));
+  return {
+    stepTime: target.clone(),
+    step: {
+      when: target.toISOString(),
+      instruction: field.instruction,
+    },
+  };
+};
+
+const getValidSequence = (stepTime: moment.Moment, spacings: number[]) => {
+  let times: moment.Moment[] = spacings.map((item: number) =>
+    subtractMinutes(stepTime, item)
+  );
+  let invalidTime: moment.Moment | undefined = _.find(
+    times,
+    (time: moment.Moment) => nextValidTarget(time) != time
+  );
+  console.log("test", times);
+  while (invalidTime) {
+    const stepTime = nextValidTarget(invalidTime).add(spacings[0], "minute");
+    times = spacings.map((item: number) => subtractMinutes(stepTime, item));
+    invalidTime = _.find(
+      times,
+      (time: moment.Moment) => nextValidTarget(time) != time
+    );
+    console.log("ttt", times);
+  }
+  return times;
+};
+
 const generateFoldInstructions = (
   numFolds: number,
   timeBetweenFolds: number,
   stepTime: moment.Moment
 ): Info => {
-  const steps = [];
-  for (let i = 0; i < numFolds; i++) {
-    const foldTime = subtractMinutes(stepTime, timeBetweenFolds);
-    steps.push({
-      when: foldTime.toISOString(),
-      instruction: "Perform another fold",
-    });
-    stepTime = foldTime.clone();
-  }
+  const foldTimes = getValidSequence(
+    stepTime,
+    _.range(numFolds).map((idx: number) => idx * timeBetweenFolds)
+  );
+
+  const steps = foldTimes.map((foldTime: moment.Moment) => ({
+    when: foldTime.toISOString(),
+    instruction: "Perform another fold",
+  }));
+  stepTime = foldTimes[foldTimes.length - 1].clone();
+
   return {
     stepTime,
     steps,
+  };
+};
+
+const generateProvingStep = (
+  proof: ProofFieldType,
+  stepTime: moment.Moment
+): Step => {
+  const proofFrom = proof.value.duration.value.from;
+  const proofTime = nextValidTarget(subtractMinutes(stepTime, proofFrom));
+  const limit = subtractMinutes(stepTime, proof.value.duration.value.to);
+  let instruction = proof.instruction;
+  if (proof.value.inFridge.value || proofTime.isBefore(limit)) {
+    instruction += " (in the fridge)";
+  }
+  return {
+    when: proofTime.toISOString(),
+    instruction,
   };
 };
 
@@ -39,34 +126,11 @@ const generateProvingInstructions = (
   secondProof: ProofFieldType,
   stepTime: moment.Moment
 ): Info => {
-  const secondFrom = secondProof.value.duration.value.from;
-  const secondProofTime = subtractMinutes(stepTime, secondFrom);
-  const steps = [
-    {
-      when: secondProofTime.toISOString(),
-      instruction: secondProof.instruction,
-    },
-  ];
-  const firstFrom = firstProof.value.duration.value.from;
-  const firstProofTime = subtractMinutes(secondProofTime, firstFrom);
-  steps.push({
-    when: firstProofTime.toISOString(),
-    instruction: firstProof.instruction,
-  });
+  const secondStep = generateProvingStep(secondProof, stepTime);
+  const firstStep = generateProvingStep(firstProof, moment(secondStep.when));
   return {
-    stepTime: firstProofTime.clone(),
-    steps,
-  };
-};
-
-const generateStep = (field: NumberFieldType, stepTime: moment.Moment) => {
-  const newTime = subtractMinutes(stepTime, field.value);
-  return {
-    stepTime: newTime.clone(),
-    step: {
-      when: newTime.toISOString(),
-      instruction: field.instruction,
-    },
+    stepTime: moment(firstStep.when),
+    steps: [secondStep, firstStep],
   };
 };
 
@@ -81,22 +145,28 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       },
     ];
 
-    const { stepTime: coolingTime, step: coolingStep } = generateStep(
-      body[SectionId.Baking].cooling,
-      eatingTime
-    );
-    steps.push(coolingStep);
-    const { stepTime: bakingTime, step: bakingStep } = generateStep(
-      body[SectionId.Baking].baking,
-      coolingTime
-    );
-    steps.push(bakingStep);
+    const coolingTime = body[SectionId.Baking].cooling.value;
+    const bakingTime = body[SectionId.Baking].baking.value;
+    // TODO: for noKnead,include folding times
+    const times = getValidSequence(eatingTime, [
+      coolingTime,
+      coolingTime + bakingTime,
+      coolingTime + bakingTime + body[SectionId.Baking].preheat.value,
+    ]);
+    steps.push({
+      when: times[0].toISOString(),
+      instruction: body[SectionId.Baking].cooling.instruction,
+    });
+    steps.push({
+      when: times[1].toISOString(),
+      instruction: body[SectionId.Baking].baking.instruction,
+    });
+    steps.push({
+      when: times[2].toISOString(),
+      instruction: body[SectionId.Baking].preheat.instruction,
+    });
     // eslint-disable-next-line prefer-const
-    let { stepTime, step: preheatStep } = generateStep(
-      body[SectionId.Baking].preheat,
-      bakingTime
-    );
-    steps.push(preheatStep);
+    let stepTime = times[2];
 
     switch (body[SectionId.Basic].method) {
       case "fold": {

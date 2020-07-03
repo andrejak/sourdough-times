@@ -31,8 +31,7 @@ const ConfigForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const config = sections; // TODO
-    console.log(config);
+    const config = sections;
     const response = await fetch("/.netlify/functions/calculate", {
       body: JSON.stringify(config),
       method: "POST",

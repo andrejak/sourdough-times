@@ -39,7 +39,6 @@ const NumberField = ({
   );
   const value = convertToUnit(field.value || field.min || 0, field.displayUnit);
   const multiplier = field.displayUnit === "h" ? 60 : 1;
-  console.log("rerender", value);
 
   return (
     <Container>

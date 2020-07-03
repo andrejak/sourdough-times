@@ -26,7 +26,7 @@ export const DateTimeField = ({
   setValue: (newValue: moment.Moment) => void;
 }): JSX.Element => {
   const date = field.value.format("YYYY-MM-DD");
-  const time = field.value.format("hh:mm");
+  const time = field.value.format("HH:mm");
   return (
     <Container>
       <Label>{field.label}</Label>
