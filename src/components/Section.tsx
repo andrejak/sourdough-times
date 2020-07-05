@@ -20,6 +20,22 @@ const Section = ({ sectionId }: { sectionId: SectionId }): JSX.Element => {
         const field = section[fieldId];
         if (fieldId === "method") {
           return <span key={fieldId} />;
+        } else if (Array.isArray(field)) {
+          // TODO: Subsection name?
+          // TODO: Hour & time range (not numbers)
+          // TODO: "Add another" and "Remove" buttons
+          return field.map((elem, idx) => (
+            <Field
+              key={idx}
+              field={elem}
+              setValue={(newValue: any) => {
+                const newConfig = produce((draft) => {
+                  draft[sectionId][fieldId][idx].value = newValue;
+                });
+                setConfig(newConfig);
+              }}
+            />
+          ));
         }
         return (
           <Field

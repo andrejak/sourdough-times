@@ -15,6 +15,9 @@ import {
 import moment from "moment";
 
 export const minsInH = 60;
+export const dateFormat = "YYYY-MM-DD";
+export const timeFormat = "HH:mm";
+export const datetimeFormat = `${dateFormat} ${timeFormat}`;
 
 const fridgeField = (value: boolean): BooleanFieldType => ({
   label: "in the fridge",
@@ -50,6 +53,24 @@ const initBasicSection = (method: Method): BasicSection => ({
     instruction: "Feed the starter and leave it outside the fridge",
   },
   method,
+  restrictedPeriods: [
+    {
+      type: "range",
+      label: "Work",
+      value: {
+        from: moment("13:00", timeFormat),
+        to: moment("15:00", timeFormat),
+      },
+    },
+    {
+      label: "Sleep",
+      type: "range",
+      value: {
+        from: moment("23:00", timeFormat).subtract("day", 1),
+        to: moment("07:00", timeFormat),
+      },
+    },
+  ],
 });
 
 const initBakingSection: BakingSection = {

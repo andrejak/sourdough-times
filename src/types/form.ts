@@ -1,4 +1,9 @@
-import { FieldType, NumberFieldType, ProofFieldType } from "./fields";
+import {
+  FieldType,
+  NumberFieldType,
+  ProofFieldType,
+  RangeFieldType,
+} from "./fields";
 
 export type Method = "fold" | "knead" | "noKnead";
 
@@ -7,7 +12,7 @@ export enum SectionId {
   Preferment = "Preferment",
   Folding = "Folding",
   Proving = "Proving",
-  BulkFerment = "BulkFerment",
+  BulkFerment = "Bulk Ferment",
   Shaping = "Shaping",
   Baking = "Baking",
 }
@@ -24,6 +29,7 @@ export type BasicSection = {
   method: Method;
   target: FieldType;
   numFeedsPerDay: NumberFieldType;
+  restrictedPeriods: RangeFieldType<moment.Moment>[];
 };
 
 export type PrefermentSection = {

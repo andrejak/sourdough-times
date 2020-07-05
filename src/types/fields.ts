@@ -32,9 +32,9 @@ export interface NumberFieldType extends BaseFieldType {
   displayUnit?: "min" | "h";
 }
 
-export interface RangeFieldType extends BaseFieldType {
+export interface RangeFieldType<T = number> extends BaseFieldType {
   type: "range";
-  value: Range<number>;
+  value: Range<T>;
   min?: number;
   max?: number;
   step?: number;

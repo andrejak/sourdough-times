@@ -6,34 +6,24 @@ import {
   ProofFieldType,
   NumberFieldType,
   SectionId,
+  RangeFieldType,
 } from "../types";
 import moment from "moment";
 import * as _ from "lodash";
+import { timeFormat, dateFormat, datetimeFormat } from "../state";
 
-const dateFormat = "YYYY-MM-DD";
-const timeFormat = "HH:mm";
-const datetimeFormat = `${dateFormat} ${timeFormat}`;
+type Period = { from: moment.Moment; to: moment.Moment };
+type Info = { stepTime: moment.Moment; steps: Step[] };
+
 const midnight = moment("24:00", timeFormat).subtract(1, "day");
-
-// TODO make dynamic
-const restrictedBoundaries = [
-  { from: "13:00", to: "15:00" },
-  { from: "23:00", to: "07:00" },
-];
-const restrictedPeriods = restrictedBoundaries.map(({ from, to }) => ({
-  from:
-    from > to
-      ? moment(from, timeFormat).subtract(1, "day")
-      : moment(from, timeFormat),
-  to: moment(to, timeFormat),
-}));
 
 const subtractMinutes = (time: moment.Moment, value: number) =>
   time.clone().subtract(value, "minutes");
 
-type Info = { stepTime: moment.Moment; steps: Step[] };
-
-const nextValidTarget = (target: moment.Moment) => {
+const nextValidTarget = (
+  target: moment.Moment,
+  restrictedPeriods: Period[]
+) => {
   let result = target;
   const justTime = moment(target.format(timeFormat), timeFormat);
   for (const period of restrictedPeriods) {
@@ -50,8 +40,15 @@ const nextValidTarget = (target: moment.Moment) => {
   return result;
 };
 
-const generateStep = (field: NumberFieldType, stepTime: moment.Moment) => {
-  const target = nextValidTarget(subtractMinutes(stepTime, field.value));
+const generateStep = (
+  field: NumberFieldType,
+  stepTime: moment.Moment,
+  restrictedPeriods: Period[]
+) => {
+  const target = nextValidTarget(
+    subtractMinutes(stepTime, field.value),
+    restrictedPeriods
+  );
   return {
     stepTime: target.clone(),
     step: {
@@ -61,23 +58,28 @@ const generateStep = (field: NumberFieldType, stepTime: moment.Moment) => {
   };
 };
 
-const getValidSequence = (stepTime: moment.Moment, spacings: number[]) => {
+const getValidSequence = (
+  stepTime: moment.Moment,
+  spacings: number[],
+  restrictedPeriods: Period[]
+) => {
   let times: moment.Moment[] = spacings.map((item: number) =>
     subtractMinutes(stepTime, item)
   );
   let invalidTime: moment.Moment | undefined = _.find(
     times,
-    (time: moment.Moment) => nextValidTarget(time) != time
+    (time: moment.Moment) => nextValidTarget(time, restrictedPeriods) != time
   );
-  console.log("test", times);
   while (invalidTime) {
-    const stepTime = nextValidTarget(invalidTime).add(spacings[0], "minute");
+    const stepTime = nextValidTarget(invalidTime, restrictedPeriods).add(
+      spacings[0],
+      "minute"
+    );
     times = spacings.map((item: number) => subtractMinutes(stepTime, item));
     invalidTime = _.find(
       times,
-      (time: moment.Moment) => nextValidTarget(time) != time
+      (time: moment.Moment) => nextValidTarget(time, restrictedPeriods) != time
     );
-    console.log("ttt", times);
   }
   return times;
 };
@@ -85,11 +87,13 @@ const getValidSequence = (stepTime: moment.Moment, spacings: number[]) => {
 const generateFoldInstructions = (
   numFolds: number,
   timeBetweenFolds: number,
-  stepTime: moment.Moment
+  stepTime: moment.Moment,
+  restrictedPeriods: Period[]
 ): Info => {
   const foldTimes = getValidSequence(
     stepTime,
-    _.range(numFolds).map((idx: number) => idx * timeBetweenFolds)
+    _.range(numFolds).map((idx: number) => idx * timeBetweenFolds),
+    restrictedPeriods
   );
 
   const steps = foldTimes.map((foldTime: moment.Moment) => ({
@@ -106,10 +110,14 @@ const generateFoldInstructions = (
 
 const generateProvingStep = (
   proof: ProofFieldType,
-  stepTime: moment.Moment
+  stepTime: moment.Moment,
+  restrictedPeriods: Period[]
 ): Step => {
   const proofFrom = proof.value.duration.value.from;
-  const proofTime = nextValidTarget(subtractMinutes(stepTime, proofFrom));
+  const proofTime = nextValidTarget(
+    subtractMinutes(stepTime, proofFrom),
+    restrictedPeriods
+  );
   const limit = subtractMinutes(stepTime, proof.value.duration.value.to);
   let instruction = proof.instruction;
   if (proof.value.inFridge.value || proofTime.isBefore(limit)) {
@@ -124,10 +132,19 @@ const generateProvingStep = (
 const generateProvingInstructions = (
   firstProof: ProofFieldType,
   secondProof: ProofFieldType,
-  stepTime: moment.Moment
+  stepTime: moment.Moment,
+  restrictedPeriods: Period[]
 ): Info => {
-  const secondStep = generateProvingStep(secondProof, stepTime);
-  const firstStep = generateProvingStep(firstProof, moment(secondStep.when));
+  const secondStep = generateProvingStep(
+    secondProof,
+    stepTime,
+    restrictedPeriods
+  );
+  const firstStep = generateProvingStep(
+    firstProof,
+    moment(secondStep.when),
+    restrictedPeriods
+  );
   return {
     stepTime: moment(firstStep.when),
     steps: [secondStep, firstStep],
@@ -137,6 +154,23 @@ const generateProvingInstructions = (
 const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
   try {
     const body: FullConfig = JSON.parse(event.body);
+    const restrictedBoundaries = body[SectionId.Basic].restrictedPeriods.map(
+      (period: RangeFieldType<moment.Moment>) => ({
+        from: moment(period.value.from).format(timeFormat),
+        to: moment(period.value.to).format(timeFormat),
+      })
+    );
+    const restrictedPeriods: Period[] = restrictedBoundaries.map(
+      ({ from, to }) => ({
+        from:
+          from > to
+            ? moment(from, timeFormat).subtract(1, "day")
+            : moment(from, timeFormat),
+        to: moment(to, timeFormat),
+      })
+    );
+    // TODO: make sure restrictions apply for all relevant days, not just one
+
     const eatingTime = moment(body[SectionId.Basic].target.value.toString());
     let steps: Step[] = [
       {
@@ -148,11 +182,15 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
     const coolingTime = body[SectionId.Baking].cooling.value;
     const bakingTime = body[SectionId.Baking].baking.value;
     // TODO: for noKnead,include folding times
-    const times = getValidSequence(eatingTime, [
-      coolingTime,
-      coolingTime + bakingTime,
-      coolingTime + bakingTime + body[SectionId.Baking].preheat.value,
-    ]);
+    const times = getValidSequence(
+      eatingTime,
+      [
+        coolingTime,
+        coolingTime + bakingTime,
+        coolingTime + bakingTime + body[SectionId.Baking].preheat.value,
+      ],
+      restrictedPeriods
+    );
     steps.push({
       when: times[0].toISOString(),
       instruction: body[SectionId.Baking].cooling.instruction,
@@ -173,14 +211,16 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         const proofs = generateProvingInstructions(
           body[SectionId.BulkFerment].firstProof,
           body[SectionId.BulkFerment].secondProof,
-          stepTime
+          stepTime,
+          restrictedPeriods
         );
         stepTime = proofs.stepTime;
         steps = steps.concat(proofs.steps);
         const folds = generateFoldInstructions(
           body[SectionId.Folding].numFolds.value as number,
           body[SectionId.Folding].timeBetweenFolds.value as number,
-          stepTime
+          stepTime,
+          restrictedPeriods
         );
         stepTime = folds.stepTime;
         steps = steps.concat(folds.steps);
@@ -190,14 +230,16 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         const folds = generateFoldInstructions(
           body[SectionId.Folding].numFolds.value as number,
           body[SectionId.Folding].timeBetweenFolds.value as number,
-          stepTime
+          stepTime,
+          restrictedPeriods
         );
         stepTime = folds.stepTime;
         steps = steps.concat(folds.steps);
         const proofs = generateProvingInstructions(
           body[SectionId.Proving].firstProof,
           body[SectionId.Proving].secondProof,
-          stepTime
+          stepTime,
+          restrictedPeriods
         );
         stepTime = proofs.stepTime;
         steps = steps.concat(proofs.steps);
@@ -207,7 +249,8 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
         const proofs = generateProvingInstructions(
           body[SectionId.Proving].firstProof,
           body[SectionId.Proving].secondProof,
-          stepTime
+          stepTime,
+          restrictedPeriods
         );
         stepTime = proofs.stepTime;
         steps = steps.concat(proofs.steps);
@@ -218,7 +261,8 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
     if (body[SectionId.Preferment].levain.value != null) {
       const { stepTime: levainTime, step: levainStep } = generateStep(
         body[SectionId.Preferment].levain,
-        stepTime
+        stepTime,
+        restrictedPeriods
       );
       steps.push(levainStep);
       stepTime = levainTime.clone();
@@ -226,7 +270,8 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
     if (body[SectionId.Preferment].autolyse.value != null) {
       const { stepTime: autolyseTime, step: autolyseStep } = generateStep(
         body[SectionId.Preferment].levain,
-        stepTime
+        stepTime,
+        restrictedPeriods
       );
       steps.push(autolyseStep);
       stepTime = autolyseTime.clone();
