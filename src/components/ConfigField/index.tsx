@@ -14,20 +14,19 @@ const mapTypeToComponent = {
   proof: ProofField,
 };
 
-const Field = ({
+const ConfigField = ({
+  id,
+  label,
+  type,
   field,
-  setValue,
 }: {
-  field: FieldType;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: (newValue: any) => void;
+  id: string;
+  label: string;
+  type: string;
+  field?: FieldType;
 }): JSX.Element => {
-  const Component = mapTypeToComponent[field.type];
-  return React.useMemo(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    () => <Component field={field as any} setValue={setValue} />,
-    [field]
-  );
+  const Component = mapTypeToComponent[type];
+  return <Component id={id} label={label} field={field} />;
 };
 
-export default Field;
+export default ConfigField;

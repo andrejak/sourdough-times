@@ -1,57 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import Field from "./Field";
+import Field from "./ConfigField";
 import { Heading } from "./Heading";
-import produce from "immer";
-import { SectionId } from "../types";
-import { FormContext } from "../state/context";
+import { SectionId, Section } from "../types";
 
-const Section = ({ sectionId }: { sectionId: SectionId }): JSX.Element => {
-  const { sections, setConfig } = React.useContext(FormContext);
-  const section = sections[sectionId];
-  return (
-    <div>
-      {sectionId != SectionId.Basic && (
-        <Heading>
-          {sectionId.toString().replace("Section", "").toUpperCase()}
-        </Heading>
-      )}
-      {Object.keys(section).map((fieldId) => {
-        const field = section[fieldId];
-        if (fieldId === "method") {
-          return <span key={fieldId} />;
-        } else if (Array.isArray(field)) {
-          // TODO: Subsection name?
-          // TODO: Hour & time range (not numbers)
-          // TODO: "Add another" and "Remove" buttons
-          return field.map((elem, idx) => (
-            <Field
-              key={idx}
-              field={elem}
-              setValue={(newValue: any) => {
-                const newConfig = produce((draft) => {
-                  draft[sectionId][fieldId][idx].value = newValue;
-                });
-                setConfig(newConfig);
-              }}
-            />
-          ));
-        }
-        return (
+const Section = ({
+  sectionId,
+  section,
+}: {
+  sectionId: SectionId;
+  section: Section;
+}): JSX.Element => (
+  <div>
+    {sectionId != SectionId.Basic && (
+      <Heading>
+        {sectionId.toString().replace("Section", "").toUpperCase()}
+      </Heading>
+    )}
+    {Object.keys(section).map((fieldId) => {
+      const field = section[fieldId];
+      if (fieldId === "method") {
+        return <span key={fieldId} />;
+      } else if (Array.isArray(field)) {
+        // TODO: Subsection name?
+        // TODO: "Add another" and "Remove" buttons
+        return field.map((elem, idx) => (
           <Field
-            key={fieldId}
-            field={field}
-            setValue={(newValue: any) => {
-              const newConfig = produce((draft) => {
-                draft[sectionId][fieldId].value = newValue;
-              });
-              setConfig(newConfig);
-            }}
+            key={idx}
+            id={`${sectionId}.${fieldId}[${idx}].value`}
+            label={elem.label}
+            type={elem.type}
+            field={elem}
           />
-        );
-      })}
-    </div>
-  );
-};
+        ));
+      }
+      return (
+        <Field
+          key={fieldId}
+          id={`${sectionId}.${fieldId}.value`}
+          label={field.label}
+          type={field.type}
+          field={field}
+        />
+      );
+    })}
+  </div>
+);
 
 export default Section;

@@ -1,6 +1,6 @@
 import React from "react";
-import { BooleanFieldType } from "../../types";
 import styled from "styled-components";
+import { Field } from "formik";
 
 const Container = styled.div`
   display: flex;
@@ -11,24 +11,20 @@ const Container = styled.div`
 
 const Label = styled.label``;
 
-const Input = styled.input`
+const Input = styled(Field)`
   width: 20px;
 `;
 
 const CheckboxField = ({
-  field,
-  setValue,
+  id,
+  label,
 }: {
-  field: BooleanFieldType;
-  setValue: (newValue: boolean) => void;
+  id: string;
+  label: string;
 }): JSX.Element => (
   <Container>
-    <Input
-      type="checkbox"
-      checked={field.value === true}
-      onChange={() => setValue(!field.value)}
-    ></Input>
-    <Label>{field.label}</Label>
+    <Input type="checkbox" name={id}></Input>
+    <Label htmlFor={id}>{label}</Label>
   </Container>
 );
 

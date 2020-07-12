@@ -26,7 +26,6 @@ export type Section =
   | FoldingSection;
 
 export type BasicSection = {
-  method: Method;
   target: FieldType;
   numFeedsPerDay: NumberFieldType;
   restrictedPeriods: RangeFieldType<moment.Moment>[];
@@ -58,6 +57,7 @@ export interface FoldingSection {
 }
 
 export type FullConfig = {
+  method: Method;
   basicSection: BasicSection;
   prefermentSection?: PrefermentSection;
   foldingSection?: FoldingSection;

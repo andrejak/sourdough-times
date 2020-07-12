@@ -12,31 +12,21 @@ const HorizontalContainer = styled.div`
 `;
 
 const ProofField = ({
+  id,
   field,
-  setValue,
 }: {
+  id: string;
   field: ProofFieldType;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: (newValue: any) => void;
 }): JSX.Element => (
   <HorizontalContainer>
     <RangeField
+      id={`${id}.duration.value`}
+      label={field.value.duration.label}
       field={field.value.duration}
-      setValue={(newValue) =>
-        setValue({
-          ...field.value,
-          duration: { ...field.value.duration, value: newValue },
-        })
-      }
     />
     <CheckboxField
-      field={field.value.inFridge}
-      setValue={(newValue) =>
-        setValue({
-          ...field.value,
-          inFridge: { ...field.value.inFridge, value: newValue },
-        })
-      }
+      id={`${id}.inFridge.value`}
+      label={field.value.inFridge.label}
     />
   </HorizontalContainer>
 );

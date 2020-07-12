@@ -206,7 +206,7 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
     // eslint-disable-next-line prefer-const
     let stepTime = times[2];
 
-    switch (body[SectionId.Basic].method) {
+    switch (body.method) {
       case "fold": {
         const proofs = generateProvingInstructions(
           body[SectionId.BulkFerment].firstProof,
@@ -258,7 +258,7 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       }
     }
 
-    if (body[SectionId.Preferment].levain.value != null) {
+    if (body[SectionId.Preferment].levain.value !== "") {
       const { stepTime: levainTime, step: levainStep } = generateStep(
         body[SectionId.Preferment].levain,
         stepTime,
@@ -267,9 +267,9 @@ const handler = async (event: APIGatewayEvent): Promise<FormResponse> => {
       steps.push(levainStep);
       stepTime = levainTime.clone();
     }
-    if (body[SectionId.Preferment].autolyse.value != null) {
+    if (body[SectionId.Preferment].autolyse.value !== "") {
       const { stepTime: autolyseTime, step: autolyseStep } = generateStep(
-        body[SectionId.Preferment].levain,
+        body[SectionId.Preferment].autolyse,
         stepTime,
         restrictedPeriods
       );

@@ -14,7 +14,6 @@ import {
 } from "../types";
 import moment from "moment";
 
-export const minsInH = 60;
 export const dateFormat = "YYYY-MM-DD";
 export const timeFormat = "HH:mm";
 export const datetimeFormat = `${dateFormat} ${timeFormat}`;
@@ -28,14 +27,14 @@ const fridgeField = (value: boolean): BooleanFieldType => ({
 const hourRangeField = (from: number, to: number): RangeFieldType => ({
   label: "hours",
   type: "range",
-  value: { from: from * minsInH, to: to * minsInH },
-  min: 1 * minsInH,
-  max: 48 * minsInH,
-  step: minsInH,
+  value: { from: from, to: to },
+  min: 1,
+  max: 48,
+  step: 1,
   displayUnit: "h",
 });
 
-const initBasicSection = (method: Method): BasicSection => ({
+const initBasicSection: BasicSection = {
   target: {
     label: "When do you want to eat the bread?",
     help: "",
@@ -52,7 +51,6 @@ const initBasicSection = (method: Method): BasicSection => ({
     max: 4,
     instruction: "Feed the starter and leave it outside the fridge",
   },
-  method,
   restrictedPeriods: [
     {
       type: "range",
@@ -66,12 +64,12 @@ const initBasicSection = (method: Method): BasicSection => ({
       label: "Sleep",
       type: "range",
       value: {
-        from: moment("23:00", timeFormat).subtract("day", 1),
+        from: moment("23:00", timeFormat).subtract(1, "day"),
         to: moment("07:00", timeFormat),
       },
     },
   ],
-});
+};
 
 const initBakingSection: BakingSection = {
   preheat: {
@@ -94,10 +92,10 @@ const initBakingSection: BakingSection = {
   cooling: {
     label: "wait for it to cool",
     type: "number",
-    value: 2 * minsInH,
-    min: 1 * minsInH,
-    max: 24 * minsInH,
-    step: 1 * minsInH,
+    value: 2,
+    min: 1,
+    max: 24,
+    step: 1,
     optional: true,
     instruction: "Take it out and let it cool",
     displayUnit: "h",
@@ -109,7 +107,7 @@ const initPrefermentSection: PrefermentSection = {
     label: "autolyse",
     help: "Mixing flour and water before adding salt",
     type: "number",
-    value: null,
+    value: ("" as unknown) as number,
     optional: true,
     min: 15,
     max: 60,
@@ -120,7 +118,7 @@ const initPrefermentSection: PrefermentSection = {
     label: "levain",
     help: "Mixing flour, water and starter before adding salt",
     type: "number",
-    value: null,
+    value: ("" as unknown) as number,
     optional: true,
     min: 15,
     max: 60,
@@ -200,7 +198,7 @@ const initBulkFermentSection: ProvingSection = {
 };
 
 export const initSections: { [key in SectionId]: Section } = {
-  [SectionId.Basic]: initBasicSection("noKnead"),
+  [SectionId.Basic]: initBasicSection,
   [SectionId.Preferment]: initPrefermentSection,
   [SectionId.Folding]: initFoldingSection(2),
   [SectionId.Proving]: initProvingSection(true, 8, 24),
@@ -218,7 +216,8 @@ export const sectionsPerMethod: { [key in Method]: SectionId[] } = {
 };
 
 export const initNoKneadConfig: FullConfig = {
-  basicSection: initBasicSection("noKnead"),
+  method: "noKnead",
+  basicSection: initBasicSection,
   prefermentSection: initPrefermentSection,
   foldingSection: initFoldingSection(2),
   provingSection: initProvingSection(true, 8, 24),
@@ -227,7 +226,8 @@ export const initNoKneadConfig: FullConfig = {
 };
 
 export const initKneadConfig: FullConfig = {
-  basicSection: initBasicSection("knead"),
+  method: "knead",
+  basicSection: initBasicSection,
   prefermentSection: initPrefermentSection,
   provingSection: initProvingSection(false, 1, 3),
   shapingSection: initShapingSection,
@@ -235,7 +235,8 @@ export const initKneadConfig: FullConfig = {
 };
 
 export const initFoldConfig: FullConfig = {
-  basicSection: initBasicSection("fold"),
+  method: "fold",
+  basicSection: initBasicSection,
   prefermentSection: initPrefermentSection,
   foldingSection: initFoldingSection(4),
   provingSection: initBulkFermentSection,
