@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
+import { Section, SectionId } from "../types";
 import Field from "./ConfigField";
 import { Heading } from "./Heading";
-import { SectionId, Section } from "../types";
 
 const Section = ({
   sectionId,
@@ -13,9 +13,7 @@ const Section = ({
 }): JSX.Element => (
   <div>
     {sectionId != SectionId.Basic && (
-      <Heading>
-        {sectionId.toString().replace("Section", "").toUpperCase()}
-      </Heading>
+      <Heading>{sectionId.toString().replace("Section", "")}</Heading>
     )}
     {Object.keys(section).map((fieldId) => {
       const field = section[fieldId];

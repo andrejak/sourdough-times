@@ -1,21 +1,14 @@
 /* eslint-disable react/display-name */
 import React from "react";
-import styled from "styled-components";
 import {
-  RangeFieldType,
-  NumberFieldType,
   DateTimeFieldType,
+  NumberFieldType,
+  RangeFieldType,
 } from "../../types";
-import NumberField from "./NumberField";
+import { Container } from "./Common";
 import DateTimeField from "./DateTimeField";
-import { timeFormat } from "../../state";
+import NumberField from "./NumberField";
 
-const Container = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  height: 40px;
-`;
 const RangeField = ({
   id,
   label,
@@ -88,11 +81,9 @@ const RangeField = ({
 
   return (
     <Container>
-      <Container>
-        {typeof field.value.from === "number" ? "from" : label}
-        <FromComponent />
-        <ToComponent />
-      </Container>
+      {typeof field.value.from === "number" ? "from" : label}
+      <FromComponent />
+      <ToComponent />
     </Container>
   );
 };

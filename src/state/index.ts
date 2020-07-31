@@ -1,18 +1,18 @@
-import {
-  FullConfig,
-  BooleanFieldType,
-  BasicSection,
-  BakingSection,
-  ShapingSection,
-  PrefermentSection,
-  Method,
-  RangeFieldType,
-  ProvingSection,
-  FoldingSection,
-  SectionId,
-  Section,
-} from "../types";
 import moment from "moment";
+import {
+  BakingSection,
+  BasicSection,
+  BooleanFieldType,
+  FoldingSection,
+  FullConfig,
+  Method,
+  PrefermentSection,
+  ProvingSection,
+  RangeFieldType,
+  Section,
+  SectionId,
+  ShapingSection,
+} from "../types";
 
 export const dateFormat = "YYYY-MM-DD";
 export const timeFormat = "HH:mm";
@@ -43,13 +43,13 @@ const initBasicSection: BasicSection = {
     instruction: "Eat the bread!",
   },
   numFeedsPerDay: {
-    label: "How many times a day you usually feed it",
+    label: "feedings per day",
     help: "",
     type: "number",
     value: 1,
     min: 1,
     max: 4,
-    instruction: "Feed the starter and leave it outside the fridge",
+    instruction: "Feed the starter and leave it outside the fridge.",
   },
   restrictedPeriods: [
     {

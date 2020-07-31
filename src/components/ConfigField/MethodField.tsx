@@ -1,16 +1,12 @@
 import React from "react";
-import { Method } from "../../types";
 import styled from "styled-components";
+import { Method } from "../../types";
+import { Label } from "./Common";
 
 const Container = styled.div`
   display: flex;
   align-items: baseline;
-  padding: 0.5rem 0;
-`;
-
-const Label = styled.label`
-  margin-bottom: 0.5rem;
-  padding: 0 0.5rem;
+  padding: 8px 0;
 `;
 
 const methodOptions: { [key in Method]: string } = {
@@ -19,15 +15,19 @@ const methodOptions: { [key in Method]: string } = {
   knead: "Knead",
 };
 
-const Option = styled.span<{ selected: boolean }>`
+const Option = styled.span<{ selected: boolean; index: number }>`
   cursor: pointer;
-  background-color: ${(props) => (props.selected ? "gray" : "lightgray")};
-  border: 1px solid gray;
-  padding: 0.2rem 0.5rem;
+  background-color: ${(props) => (props.selected ? "lightgray" : "white")};
+  border: 1px solid lightgray;
+  padding: 4px 8px;
+  ${(props) => props.index === 0 && "border-radius: 4px 0 0 4px;"}
+  ${(props) =>
+    props.index === Object.keys(methodOptions).length - 1 &&
+    "border-radius: 0 4px 4px 0;"}
 
   &:hover {
     cursor: pointer;
-    background-color: gray;
+    background-color: lightblue;
     transition: all 100ms ease;
   }
 `;
@@ -42,11 +42,12 @@ const MethodField = ({
   <Container>
     <Label>Method: </Label>
     <div>
-      {Object.keys(methodOptions).map((method: Method) => (
+      {Object.keys(methodOptions).map((method: Method, index) => (
         <Option
           key={method}
           selected={field === method}
           onClick={() => setValue(method)}
+          index={index}
         >
           {methodOptions[method]}
         </Option>

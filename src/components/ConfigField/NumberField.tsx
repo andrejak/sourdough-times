@@ -1,22 +1,19 @@
+import { Field, useFormikContext } from "formik";
 import React from "react";
 import styled from "styled-components";
 import { NumberFieldType } from "../../types";
-import { Field, useFormikContext } from "formik";
-
-const Container = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  height: 40px;
-`;
+import { Container } from "./Common";
 
 const Label = styled.label`
-  padding: 0 0.5rem;
+  padding: 0 8px;
 `;
 
 const Input = styled(Field)`
   width: 40px;
-  margin: 0 0.5rem;
+  margin: 0 4px;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  text-align: center;
 `;
 
 const NumberField = ({

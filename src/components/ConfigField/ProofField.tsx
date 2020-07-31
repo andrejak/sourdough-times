@@ -8,7 +8,7 @@ const HorizontalContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0.5rem;
+  padding-left: 4px;
 `;
 
 const ProofField = ({

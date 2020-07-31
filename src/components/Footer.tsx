@@ -3,14 +3,14 @@ import styled from "styled-components";
 
 const Container = styled.div`
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 16px;
   width: 100vw;
 `;
 
 const Footer: React.FC = () => (
   <Container>
     <hr />
-    ©️ 2020 Andreja Kogovsek
+    ©️ 2020 AK
   </Container>
 );
 

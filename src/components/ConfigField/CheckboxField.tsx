@@ -1,6 +1,6 @@
+import { Field } from "formik";
 import React from "react";
 import styled from "styled-components";
-import { Field } from "formik";
 
 const Container = styled.div`
   display: flex;
@@ -9,10 +9,8 @@ const Container = styled.div`
   padding-right: 0.4rem;
 `;
 
-const Label = styled.label``;
-
 const Input = styled(Field)`
-  width: 20px;
+  width: 25px;
 `;
 
 const CheckboxField = ({
@@ -24,7 +22,7 @@ const CheckboxField = ({
 }): JSX.Element => (
   <Container>
     <Input type="checkbox" name={id}></Input>
-    <Label htmlFor={id}>{label}</Label>
+    <label htmlFor={id}>{label}</label>
   </Container>
 );
 

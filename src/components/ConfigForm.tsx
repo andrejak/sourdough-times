@@ -1,16 +1,16 @@
+import { Form, Formik } from "formik";
 import React from "react";
-import { Step, SectionId, Method } from "../types";
 import styled from "styled-components";
+import { initSections, sectionsPerMethod } from "../state";
+import { Method, SectionId, Step } from "../types";
+import Button from "./Button";
 import MethodField from "./ConfigField/MethodField";
 import Section from "./Section";
-import Button from "./Button";
-import { initSections, sectionsPerMethod } from "../state";
-import { Formik, Form } from "formik";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 16px;
   max-width: 450px;
 `;
 

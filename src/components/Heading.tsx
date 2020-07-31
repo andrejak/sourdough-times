@@ -1,7 +1,8 @@
 import styled from "styled-components";
 
 export const Heading = styled.h2`
-  margin: 0.5rem 0.5rem 0.3rem 0.5rem;
+  margin: 16px 8px 4px 0;
   padding: 0;
   font-size: 18px;
+  text-transform: uppercase;
 `;

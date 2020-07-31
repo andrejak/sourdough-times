@@ -1,19 +1,16 @@
+import { Field, useField, useFormikContext } from "formik";
 import React from "react";
-import styled from "styled-components";
-import { Field, useFormikContext, useField } from "formik";
 import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
+import styled from "styled-components";
+import { Container, Label } from "./Common";
 
-const Container = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  height: 40px;
-`;
-
-const Label = styled.label`
-  padding: 0 0.5rem;
+const StyledDatePicker = styled(DatePicker)`
+  text-align: center;
+  width: ${(props) => (props.showTimeSelectOnly ? "65" : "160")}px;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  margin-top: 3px;
 `;
 
 export const DateTimeField = ({
@@ -34,7 +31,7 @@ export const DateTimeField = ({
       <Field
         name={id}
         component={() => (
-          <DatePicker
+          <StyledDatePicker
             {...field}
             name={id}
             selected={new Date(field.value)}
