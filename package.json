@@ -43,7 +43,7 @@
   "dependencies": {
     "aws-lambda": "^1.0.6",
     "formik": "^2.1.4",
-    "immer": "^7.0.0",
+    "immer": "^8.0.1",
     "moment": "^2.26.0",
     "react": "^16.13.1",
     "react-datepicker": "^3.1.3",
